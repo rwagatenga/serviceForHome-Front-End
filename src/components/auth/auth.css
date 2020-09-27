@@ -1,0 +1,71 @@
+/*.divAll {
+	color: white;
+}
+.textInput {
+	color: white;
+}*/
+.root {
+	width: '100%';
+},
+/*.root .textField {
+    margin: 1;
+    width: '20ch';
+    font-weight: 500
+},*/
+.margin: {
+    margin: 1px;
+},
+.backButton {
+    margin-right: 1px;
+},
+.instructions {
+    margin-top: 1px;
+    margin-bottom: 1px;
+},
+.withoutLabel {
+    margin-top: 3px;
+},
+.textField {
+    width: '30ch';
+    margin: 5px;
+  },
+.button {
+    background-color: '#0E3D51';
+    color: 'white';
+}
+.button :hover {
+    background-color: '#0E3D51';
+    color: 'white';
+}
+.textField {
+    width: '100%';
+    margin-left: 'auto';
+    margin-right: 'auto';
+    padding-bottom: 0;
+    margin-top: 0;
+    font-weight: 500;
+}
+/*.input {
+    color: 'white';
+    width: '100%';
+  }*/
+  #status {
+  position: fixed;
+  width: 100%;
+  font: bold 1em sans-serif;
+  color: #FFF;
+  padding: 0.5em;
+}
+
+#log {
+  padding: 2.5em 0.5em 0.5em;
+  font: 1em sans-serif;
+}
+
+.online {
+  background: green;
+}
+
+.offline {
+  background: red;
+}

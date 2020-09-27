@@ -1,0 +1,19 @@
+.Logo {
+    /*background-color: white;
+    padding: 8px;
+    height: 20%;
+    box-sizing: border-box;
+    border-radius: 5px;*/
+    /*animation: App-logo-spin infinite 15s linear;*/
+  height: 55px;
+  filter: brightness(100%);
+  float: left;
+  display: flex;
+  align-items: center;
+  
+  /*margin-top: 25px;*/
+}
+
+.Logo img {
+    height: 100%;
+}
