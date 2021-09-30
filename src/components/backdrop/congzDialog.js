@@ -6,6 +6,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -13,6 +15,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function CongzDialog(props) {
   const [open, setOpen] = React.useState(false);
+  const [copy, setCopy] = React.useState(false);
+  const [value, setValue] = React.useState(props.tel);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -21,7 +25,6 @@ export default function CongzDialog(props) {
   const handleClose = () => {
     setOpen(false);
   };
-
   return (
     <div>
       {/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>
@@ -44,7 +47,23 @@ export default function CongzDialog(props) {
               <span style={{fontSize: 16}}>Your Order has been Submitted</span>
             ) : props.cart  ? (
               <span style={{fontSize: 16}}>Your Order has been added to Your Cart</span>
+            ) : props.carts  ? (
+              <span style={{fontSize: 16}}>Your Cart has been Updated</span>
+            ) : props.delete  ? (
+              <span style={{fontSize: 16}}>Your Cart has been Deleted Successful</span>
             ) : null}
+            {props.accept ? ([
+              <span style={{fontSize: 16}}>Contacts:&nbsp;</span>,
+              <a href={`tel:${value}`}>
+                <span>{value}</span>
+              </a>,
+              <span>&nbsp;&nbsp;&nbsp;</span>,
+              <CopyToClipboard text={value}
+                onCopy={() => setCopy(true)}>
+                <FileCopyIcon />
+              </CopyToClipboard>,
+              copy ? <span style={{color: 'blue'}}>Copied.</span> : null
+            ]) : null}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

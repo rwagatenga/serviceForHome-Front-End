@@ -184,7 +184,6 @@ function Row(props) {
           cart={props.cartSuccess}
         />
       ) : null}
-      {console.log(stateDialog.congzDialog)}
       {props.test.map((item, index) => ([
         <TableRow className={classes.root} key={index}>
           <TableCell>

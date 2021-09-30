@@ -19,8 +19,13 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 // import files
 import avatar from "assets/img/faces/marc.jpg";
+import CartTable from '../../components/Table/CartTable';
 import CartTables from '../../components/Table/CartTables';
 import * as actions from '../../store/actions/index';
+import ErrorHandler from '../../components/ErrorHandler/ErrorHandler';
+import CongzDialog from '../../components/backdrop/congzDialog';
+import Backdrop from '../../components/backdrop/backdrop';
+import Buttons from '../../components/Button/Buttons';
 
 const styles = {
   cardCategoryWhite: {
@@ -63,81 +68,43 @@ const useStyles = makeStyles(styles);
 
 function Cart(props) {
   const classes = useStyles();
-  const [test, setTest] = React.useState([
-    {
-      _id: "da3223",
-      serviceName: "Massage",
-      subServiceId: [
-        {
-          _id: "dah3892",
-          subServiceName: "Reflexology",
-          price: "5000"
-        },
-        {
-          _id: "dah3899",
-          subServiceName: "Swedish",
-          price: "5000"
-        },
-        {
-          _id: "dah3899",
-          subServiceName: "Swedish",
-          price: "5000"
-        }
-      ]
-    },
-    {
-      _id: "da3245",
-      serviceName: "Cleaning",
-      subServiceId: [
-        {
-          _id: "dah7792",
-          subServiceName: "Garden",
-          price: "5000"
-        },
-        {
-          _id: "dah78882",
-          subServiceName: "Mopping",
-          price: "5000"
-        }
-      ]
-    }
-  ]);
+  const [refresh, setRefresh] = React.useState(false);
   React.useEffect(() => {
-    props.onFetchCarts(props.userId);
-  //   setTest(props.carts.orders.map(item => (
-  //     [item.serviceId.map(prop => (
-  //       [{_id: prop._id, serviceName: prop.serviceName, subServiceName: [item.subServiceId.map(sub => (
-  //         [{_id: sub._id, subServiceName: sub.subServiceName}]
-  //         )
-  //       )]
-  //     }]
-  //   )
-  // )]
-  // )));
+     // const id = setInterval(() => {
+      props.onFetchCarts(props.userId); // This effect depends on the `count` state
+    // }, 1000);
+    // return () => clearInterval(id);
   }, []);
+
   var sum = 0;
   const array = [];
-  test.map(item => array.push(...item.subServiceId));
-  for (var i = 0; i < array.length; i++) {
-    sum += parseInt(array[i].price);
-  }
-  console.log(sum);
-  // const order = [];
-  // if (props.carts.length > 0) {
-  //   props.carts.map(item => order.push(...item.orders));
+  // test.map(item => array.push(...item.subServiceId));
+  // for (var i = 0; i < array.length; i++) {
+  //   sum += parseInt(array[i].price);
   // }
   const updateCartHandler = (ev, dataInputs) => {
     ev.preventDefault();
-    const cartId = dataInputs.cartId;
+    const cartId = {...props.carts};
     const cartInputs = {
+      ...dataInputs,
       clientId: props.userId,
-      serviceId: dataInputs.serviceId,
-      subServiceId: dataInputs.subServiceId,
-      price: dataInputs.price,
-      duration: dataInputs.duration,
-      description: dataInputs.description
     };
-    props.onUpdateCart(cartInputs.cartId, cartInputs)
+    props.onUpdateCart(cartId[0]._id, cartInputs);
+  };
+  const deleteCartHandler = (serviceId, subServiceId) => {
+    const clientId = props.userId;
+    const cartId = {...props.carts};
+    props.onDeleteCart(clientId, cartId[0]._id, serviceId, subServiceId);
+  };
+  const orderCart = (carts) => {
+    if (carts) {
+      props.onCartOrder(props.userId, carts[0]._id);
+      setRefresh(true);
+    }
+  };
+  const orderClose = () => {
+    setRefresh(false);
+    props.onOrderClose();
   }
   return (
     <div>
@@ -149,16 +116,30 @@ function Cart(props) {
               <p className={classes.cardCategoryWhite}>Those are Service and its Sub-Services added to Cart</p>
             </CardHeader>
             <CardBody>
-              <CartTables
-                tableHeaderColor="primary"
-                //tableHead={[{id: "ID", field: "id"}, {serviceName: "Service Name", "Action"]}
-                tableSubHead={["ID", "Sub-Service Name", "Min-Price", "Order", "Action"]}
-                tableData={props.carts}
-                colors={classes.button}
-                adminView = "admin"
-                sub="subService"
-                updateCart = {updateCartHandler}
+            {props.loadings ? (<Backdrop open={props.loadings} clicked={props.onCancel}/>) : null}
+            {props.orderSuccess ? (
+              <CongzDialog
+                open={props.orderSuccess}
+                close={orderClose}
+                order={props.orderSuccess}
               />
+            ) : null}
+            {props.orderError ? (
+              <ErrorHandler error={props.error ? props.error : props.orderError} onHandle={props.error ? (() => props.onCancel()) : (() => props.onOrderClose())} />
+            ) : null}
+              {props.carts ? (<CartTable
+                tableHeaderColor="primary"
+                tableHead={["ID", "Service Names", "Sub-Service Name", "Price", "Duration", "Action"]}
+                tableSubHead={["Description"]}
+                tableData={props.orders}
+                colors={classes.button}
+                updateCart = {updateCartHandler}
+                error={props.cartError}
+                loading={props.loading}
+                cartSuccess={props.cartSuccess}
+                cartClose={() => props.onCartClose()} 
+                deleteCart={deleteCartHandler}
+              />) : null }
               {/*<GridContainer>
                 <table style={{fontSize: '16px'}}>
                   <tbody>
@@ -215,13 +196,27 @@ function Cart(props) {
                   </tbody>
                 </table>
               </GridContainer>*/}
-              <div className={classes.typo}>
+              {/*<div className={classes.typo}>
                 <div className={classes.note}>Minimum Pay: </div>
                 <h5>{sum} frw</h5>
-              </div>
+              </div>*/}
             </CardBody>
             <CardFooter>
-              <Button color="primary">Order</Button>
+              {(props.carts != "undefined"  
+                && props.carts != null  
+                && props.carts.length != null  
+                && props.carts.length > 0) ? (
+                <Buttons 
+                  color="primary" 
+                  orderCart={orderCart}
+                  orders={props.orders}
+                  carts={props.carts}
+                  disable={(props.orders == "undefined"  
+                  && props.orders == null  
+                  && props.orders.length == null  
+                  && props.orders.length == 0)}
+                />
+              ) : null }
             </CardFooter>
           </Card>
         </GridItem>
@@ -232,15 +227,19 @@ function Cart(props) {
 
 const mapStateToProps = state => {
     return {
-        loading: state.cart.loading,
-        error: state.cart.error,
-        orderError: state.cart.createCartError,
-        userId: state.auth.userId,
-        isAuthenticated: state.auth.token !== null,
-        authRedirectPath: state.auth.authRedirectPath,
-        services: state.service.services,
-        orderSuccess: state.order.createdOrder,
-        carts: state.cart.carts
+      loadings: state.order.loading,
+      orderError: state.order.createOrderError,
+      orderSuccess: state.order.createdOrder,
+      loading: state.cart.loading,
+      error: state.cart.error,
+      cartError: state.cart.createCartError,
+      userId: state.auth.userId,
+      isAuthenticated: state.auth.token !== null,
+      authRedirectPath: state.auth.authRedirectPath,
+      cartSuccess: state.cart.createdCart,
+      carts: state.cart.carts,
+      orders: state.cart.orders,
+      order: state.order.orders
     };
 };
 
@@ -249,7 +248,11 @@ const mapDispatchToProps = dispatch => {
         onCancel: () => dispatch( actions.onCancel() ),
         onFetchCarts: (clientId) => dispatch(actions.initCarts(clientId)),
         onCreateCart: (clientId, cartInputs) => dispatch(actions.createCart(clientId, cartInputs)),
-        onUpdateCart: (cartId, cartInputs) => dispatch(actions.updateCart(cartId, cartInputs))
+        onUpdateCart: (cartId, cartInputs) => dispatch(actions.updateCart(cartId, cartInputs)),
+        onCartClose: () => dispatch(actions.cartClose()),
+        onOrderClose: () => dispatch(actions.orderClose()),
+        onDeleteCart: (clientId, cartId, serviceId, subServiceId) => dispatch(actions.deleteCart(clientId, cartId, serviceId, subServiceId)),
+        onCartOrder: (clientId, cartId) => dispatch(actions.cartOrder(clientId, cartId))
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Cart);

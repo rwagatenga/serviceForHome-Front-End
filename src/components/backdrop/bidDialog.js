@@ -141,16 +141,12 @@ export default function ProfileDialog(props) {
     event.preventDefault();
     const data = {...inputs.bidInputs, orderId: inputs.orderId};
     props.makeBid(event, {...data});
-    if (props.error) {
-      fail=props.error;
-    } else {
-      success="Your Bid is Successful Submitted";
+    if (!props.error && props.orderSuccess) {
       setValues({
         price: '',
         duration: '',
         description: '',
       });
-
     }
   };
 

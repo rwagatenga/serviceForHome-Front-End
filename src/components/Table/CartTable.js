@@ -34,20 +34,48 @@ import ShopIcon from '@material-ui/icons/Shop';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 // Import Files
-import BidDialog from '../backdrop/bidDialog';
+import EditDialog from '../backdrop/editDialog';
 import CongzDialog from '../backdrop/congzDialog';
+import Dialog from '../backdrop/dialog';
 
 const useRowStyles = makeStyles({
   root: {
     '& > *': {
       borderBottom: 'unset',
+      fontSize: 15,
+      fontFamily: 'cursive',
     },
+    fontSize: 15,
+    fontFamily: 'cursive',
+  },
+  color: {
+    backgroundColor: '#0E3D51',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#0E3D51',
+      color: 'white'
+    }
+  },
+  note: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    color: "#c0c1c2",
+    display: "block",
+    fontWeight: "400",
+    fontSize: "18px",
+    left: "0",
+    marginLeft: "0px"
   },
 });
 const useStyles1 = makeStyles((theme) => ({
   root: {
     flexShrink: 0,
     marginLeft: theme.spacing(2.5),
+    fontSize: 15,
+    fontFamily: 'cursive',
+  },
+  table: {
+    fontSize: 15,
+    fontFamily: 'cursive',
   },
 }));
 function createData(name, calories, fat, carbs, protein, price, serviceName) {
@@ -135,11 +163,18 @@ function Row(props) {
     congzDialog: false
   });
   const [state, setState] = React.useState({
-    order: {}
+    order: {},
+    dialog: false,
+    serviceId: '',
+    subServiceId: ''
   });
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, test.length - page * rowsPerPage);
-
+  var sum = 0;
+  // test.map(item => array.push(...item.subServiceId));
+  for (var i = 0; i < test.length; i++) {
+    sum += parseInt(test[i].price);
+  }
   // const handleChangePage = (event, newPage) => {
   //   setPage(newPage);
   // };
@@ -150,7 +185,7 @@ function Row(props) {
   // };
   const handleCollapse = (item, event) => {
     if (item) {
-      let coll = test.find((index) => index._id === item );
+      let coll = test.find((index) => index.subServiceId.map(prop => prop._id).toString() === item );
       if (coll) {
         setOpen({
           stateOpen: !open.stateOpen,
@@ -166,9 +201,9 @@ function Row(props) {
 
     // props.test.find(clickedItem => clickedItem._id === item ? setOpen(!open) : null);
   };
-  const handleDialog = (orderId, event) => {
+  const handleEditDialog = (orderId, event) => {
     if (orderId) {
-      const order = props.test.find((item) => item._id === orderId);
+      const order = props.test.find((item) => item.subServiceId[0]._id === orderId);
       if (order) {
         setState({
           order: {...order}
@@ -179,7 +214,23 @@ function Row(props) {
       }
     }
   };
+  const handleDeleteDialog = (serviceId, subServiceId) => {
+    if (serviceId && subServiceId) {
+      const service = props.test.find((item) => item.serviceId[0]._id === serviceId);
+      const subService = props.test.find((item) => item.subServiceId[0]._id === subServiceId);
+      if (serviceId && subServiceId) {
+        setState({
+          dialog: true,
+          service: service.serviceId[0]._id,
+          subService: subService.subServiceId[0]._id
+        });
+      }
+    }
+  };
   const closeDialogHandle = () => {
+    setState({
+      order: {}
+    });
     setDialog({
       openDialog: false
     });
@@ -187,35 +238,51 @@ function Row(props) {
       congzDialog: false
     });
   };
-  const createBidHandler = (ev, data) => {
+  const updateCartHandler = (ev, data) => {
     ev.preventDefault();
-    props.createBid(ev, {...data});
-    if (props.bidSuccess) {
-      setDialog({
-        openDialog: false
-      });
-      setDialog({
-        congzDialog: true
-      });
-    }
+    props.updateCart(ev, {...data});
+  };
+  const cartClose = () => {
+    props.cartClose();
+    setDialog({openDialog: false});
+    setDialog({cartDialog: false});
+  };
+  const onDelete = () => {
+    props.deleteCart(state.service, state.subService);
+    setState({dialog: false});
   };
   const formatter = buildFormatter(englishStrings)
   return (
     <React.Fragment>
-    {state.order && !props.bidSuccess ? (
-      <BidDialog 
+    {state.order && !props.cartSuccess ? (
+      <EditDialog 
         open = {stateDialog.openDialog}
         close = {closeDialogHandle} 
         order = {state.order}
         color={props.color} 
-        makeBid={createBidHandler}   
+        cartSuccess={props.cartSuccess}
+        updateCart={updateCartHandler}   
         loading={props.loading}  
         error={props.error}    
-      />) : props.bidSuccess && !stateDialog.congzDialog ? (
+      />) : props.cartSuccess && !stateDialog.congzDialog ? (
         <CongzDialog
           open={() => setDialog({congzDialog: !stateDialog.congzDialog})}
-          close={() => setDialog({congzDialog: !stateDialog.congzDialog})}
-          bid={props.bidSuccess}
+          close={cartClose}
+          carts={props.cartSuccess}
+        />
+      ) : props.cartSuccess && !state.dialog ? (
+        <CongzDialog
+          open={() => setDialog({congzDialog: !stateDialog.congzDialog})}
+          close={cartClose}
+          delete={props.cartSuccess}
+        />
+      ) : null}
+      {state.dialog ? (
+        <Dialog 
+          openDialog={state.dialog} 
+          no={() => setState({dialog: false})} 
+          yes={onDelete}
+          delete={state.dialog}
         />
       ) : null}
       {(rowsPerPage > 0 ? props.test.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -223,7 +290,7 @@ function Row(props) {
       ).map((item, index) => ([
         <TableRow className={classes.root} key={index} tabIndex={-1}>
           <TableCell>
-            <IconButton aria-label="expand row" size="small" onClick={e => handleCollapse(item._id)}>
+            <IconButton aria-label="expand row" size="small" onClick={e => handleCollapse(item.subServiceId[0]._id)}>
               {open.stateOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           </TableCell>
@@ -233,28 +300,30 @@ function Row(props) {
           <TableCell>{item.serviceId.map(service => service.serviceName)}</TableCell>
           <TableCell>{item.subServiceId.map(subService => subService.subServiceName)}</TableCell>
           <TableCell>{item.price}</TableCell>
-          <TableCell>{item.clientId.map(view => view.address.sector)}</TableCell>
           <TableCell>{<TimeAgo date={item.duration} formatter={formatter}/>}</TableCell>
           <TableCell >
-            <Button type = "submit" variant="contained" onClick = {e => handleDialog(item._id)} className={props.color} disabled={item.status === 1} >
-              Bid
+            <Button type = "submit" variant="contained" onClick = {e => handleEditDialog(item.subServiceId[0]._id)} className={classes.color} disabled={item.status === 1}>
+              <EditIcon/>
+            </Button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button type = "submit" variant="contained" onClick = {e => handleDeleteDialog(item.serviceId[0]._id, item.subServiceId[0]._id)} className={classes.color} disabled={item.status === 1} >
               &nbsp;&nbsp;
-              <ShoppingCartIcon/>
+              <DeleteIcon/>
             </Button>
           </TableCell>
         </TableRow>,
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          {open.stateOpen && open.stateId === item._id ? (
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          {open.stateOpen && open.stateId === item.subServiceId[0]._id ? (
             <Collapse in={open} timeout="auto" unmountOnExit id={id}>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
                   Descriptions
                 </Typography>
                 <Table size="small" aria-label="purchases">
-                  <TableBody>
-                      <TableRow key={index}>
-                        <TableCell>{item.description} 
+                  <TableBody style={{fontSize: 15, fontFamily: 'cursive'}}>
+                      <TableRow key={index} style={{fontSize: 15, fontFamily: 'cursive'}}>
+                        <TableCell style={{fontSize: 15, fontFamily: 'cursive'}}>{item.description} 
                           Basically faithfully preserving the highest order of magnitude (and by preference, only shifting up units when passing 2 of those units - 5 weeks instead of 1 month). 
                           Basically faithfully preserving the highest order of magnitude (and by preference, only shifting up units when passing 2 of those units - 5 weeks instead of 1 month). 
                           Basically faithfully preserving the highest order of magnitude (and by preference, only shifting up units when passing 2 of those units - 5 weeks instead of 1 month).
@@ -268,8 +337,19 @@ function Row(props) {
           </TableCell>
         </TableRow>
         ]))}
+        <TableRow>
+        <TableCell> </TableCell>
+        <TableCell> </TableCell>
+        <TableCell> </TableCell>
+        <TableCell className={classes.note}>
+          Minimum Pay:
+        </TableCell>
+        <TableCell style={{fontSize: 17, fontFamily: 'cursive', fontWeight: 'bold'}}>{sum} frw</TableCell>
+        <TableCell> </TableCell>
+        <TableCell> </TableCell>
+        </TableRow>
         {emptyRows > 0 && (
-          <TableRow style={{ height: 53 * emptyRows }}>
+          <TableRow style={{ height: 25 * emptyRows }}>
             <TableCell colSpan={6} />
           </TableRow>
         )}
@@ -278,9 +358,9 @@ function Row(props) {
 }
 
 export default function CartTable(props) {
+  const classes = useStyles1();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const orders = [];
 
   //const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.tableTest.length - page * rowsPerPage);
 
@@ -293,8 +373,15 @@ export default function CartTable(props) {
     setPage(0);
   };
   return (
-    <TableContainer component={Paper} style={{maxHeight: 450}}>
-      <Table stickyHeader aria-label="collapsible table">
+    <TableContainer 
+      component={Paper} 
+      style={{
+        maxHeight: 450, 
+        fontSize: 15,
+        fontFamily: 'cursive',
+      }}
+    >
+      <Table stickyHeader aria-label="collapsible table" className={classes.table}>
         {props.tableHead !== undefined ? (
           <TableHead >
             <TableRow >
@@ -311,39 +398,42 @@ export default function CartTable(props) {
             </TableRow>
           </TableHead>
         ) : null}
-        {console.log(props.tableTest)}
-        <TableBody>
-          {/*<Row 
-            tableSubHead = {props.tableSubHead} 
-            test = {props.tableTest} 
-            color={props.colors}
-            count={props.tableTest.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-              //createOrder = {props.createOrder}
-            loading={props.loading}
-            error={props.error}
-              //orderSuccess={props.orderSuccess}
-          />*/}
-        </TableBody>
-        {/*<TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={9}
-              count={props.tableTest.length}
+        {props.tableData ? ([
+          <TableBody style={{fontSize: 15,fontFamily: 'cursive'}}>
+            <Row 
+              tableSubHead = {props.tableSubHead} 
+              test = {props.tableData} 
+              color={props.colors}
+              count={props.tableData.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
+              updateCart = {props.updateCart}
+              loading={props.loading}
+              error={props.error}
+              cartSuccess={props.cartSuccess}
+              cartClose={props.cartClose}
+              deleteCart={props.deleteCart}
             />
-          </TableRow>
-        </TableFooter>*/}
+          </TableBody>,
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={9}
+                count={props.tableData.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+        ]) : null }
       </Table>
     </TableContainer>
   );

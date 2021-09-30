@@ -37,9 +37,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 // Files
 import * as actions from '../../store/actions/index';
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler';
-import Backdrop from '../backdrop/backdrop';
-import ProfileDialog from '../backdrop/profile';
+import Backdrop from '../backdrop/backdrop'; 
 import Profile from '../backdrop/profile';
+import CongzDialog from '../backdrop/congzDialog';
 
 const useRowStyles = makeStyles({
   root: {
@@ -126,6 +126,7 @@ function Row(props) {
   });
   const [worker, setWorker] = React.useState([]);
   const [id, setId] = React.useState("");
+  const [tel, setTel] = React.useState("");
   const classes = useRowStyles();
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, test.length - page * rowsPerPage);
@@ -175,7 +176,18 @@ function Row(props) {
   let bidStatus;
   let orderStatus;
   const msg = test.map(item => ([bidStatus = item.status, item.orderId.map(prop => ([orderStatus = prop.status])) ]) );
-  
+  const acceptBidHandler = (id) => {
+    if (id) {
+      const checkTel = test.find((item) => item._id === id);
+      if (checkTel) {
+        setTel(checkTel.workerId.map(item => item.telephone).toString());
+      }
+      props.acceptBid(id);
+    }
+  };
+  const closeBidHandler = () => {
+      props.bidClose();
+  }
   return (
     <React.Fragment>
     {worker.length > 0 ? (
@@ -183,10 +195,18 @@ function Row(props) {
         open = {stateDialog.openDialog} 
         close = {dialogHandleClose} 
         data = {worker} />) : null}
-      {props.errors  ? (
+    {props.bidSuccess ? (
+      <CongzDialog
+        open={props.bidSuccess}
+        close={closeBidHandler}
+        accept={props.bidSuccess}
+        tel={tel}
+      />
+    ) : null}
+      {props.errors || props.bidError  ? (
         <TableRow className={classes.root} tabIndex={-1}>
           <TableCell></TableCell>
-          <TableCell>{props.errors}</TableCell>
+          <TableCell>{props.errors || props.bidError}</TableCell>
         </TableRow>
         ) : (rowsPerPage > 0 && test.length > 0 ? test.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : props.test
@@ -214,7 +234,7 @@ function Row(props) {
             <Button 
               type = "submit" 
               variant="contained" 
-              onClick = {() => alert(item._id)} 
+              onClick = {e => acceptBidHandler(item._id)} 
               className={props.color} 
               disabled={orderStatus === 1 }
               >
@@ -257,7 +277,7 @@ function BidsTable(props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   React.useEffect(() => {
     props.onFetchBids(props.userId, props.orderId);
-  }, [props.orderId]);
+  }, [props.orderId, props.bidSuccess]);
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.bids.length - page * rowsPerPage);
   const handleChangePage = (event, newPage) => {
@@ -267,6 +287,10 @@ function BidsTable(props) {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+  const acceptBidHandlers = (id) => {
+    console.log(id);
+    props.onAcceptBid(id);
   };
   return (
     <TableContainer component={Paper} style={{maxHeight: 450}}>
@@ -297,6 +321,10 @@ function BidsTable(props) {
               rowsPerPage={rowsPerPage}
               page={page}
               errors = {props.error}
+              bidError={props.bidError}
+              bidSuccess={props.bidSuccess}
+              acceptBid={acceptBidHandlers}
+              bidClose={props.onCloseBid}
               />
         </TableBody>
         <TableFooter>
@@ -329,7 +357,9 @@ const mapStateToProps = state => {
         authRedirectPath: state.auth.authRedirectPath,
         services: state.service.services,
         userId: state.auth.userId,
-        bids: state.bid.bids
+        bids: state.bid.bids,
+        bidError: state.bid.bidError,
+        bidSuccess: state.bid.createdBid
     };
 };
 
@@ -338,7 +368,9 @@ const mapDispatchToProps = dispatch => {
         onAuth: ( email, password ) => dispatch( actions.auth( email, password ) ),
         onSetAuthRedirectPath: () => dispatch( actions.setAuthRedirectPath( '/' ) ),
         onCancel: () => dispatch( actions.onCancel() ),
-        onFetchBids: (userId, offeredBid) => dispatch(actions.initBids(userId, offeredBid))
+        onFetchBids: (userId, offeredBid) => dispatch(actions.initBids(userId, offeredBid)),
+        onCloseBid: () => dispatch(actions.bidClose()),
+        onAcceptBid: (id) => dispatch(actions.acceptBid(id))
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(BidsTable);

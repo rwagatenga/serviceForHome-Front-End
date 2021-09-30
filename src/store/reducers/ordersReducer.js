@@ -39,7 +39,8 @@ const orderClose = (state, action) => {
 	return updateObject(state, {
 		createdOrder: false,
 		loading: false,
-		error: null
+		error: null,
+		createOrderError: null
 	})
 };
 

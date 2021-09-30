@@ -3,6 +3,7 @@ import { updateObject } from '../../shared/util';
 
 const initialState = {
 	carts: [],
+	orders: [],
 	loading: false,
 	error: null,
 	createCartError: null,
@@ -19,6 +20,7 @@ const onCancel = (state, action) => {
 const cartSuccess = (state, action) => {
 	return updateObject( state, {
 		carts: [action.carts],
+		orders: [...action.orders],
 		loading: false,
 		error: null
 	})

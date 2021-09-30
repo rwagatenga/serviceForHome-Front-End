@@ -119,6 +119,7 @@ function ViewOrders(props) {
               loading = {props.loading}
               error={props.bidError}
               bidSuccess={props.bidSuccess}
+              bidClose={() => props.onBidClose()}
             />
           </CardBody>
         </Card>
@@ -137,7 +138,7 @@ const mapStateToProps = state => {
         services: state.service.services,
         userId: state.auth.userId,
         orders: state.order.orders,
-        bidSuccess: state.bid.createdBidSuccess
+        bidSuccess: state.bid.createdBid
     };
 };
 
@@ -148,6 +149,7 @@ const mapDispatchToProps = dispatch => {
         onCancel: () => dispatch( actions.onCancel() ),
         onFetchOrders: (userId) => dispatch(actions.initOrders(userId)),
         onCreateBid: (orderId, workerId, inputs) => dispatch(actions.createBid(orderId, workerId, inputs)),
+        onBidClose: () => dispatch(actions.bidClose()),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ViewOrders);

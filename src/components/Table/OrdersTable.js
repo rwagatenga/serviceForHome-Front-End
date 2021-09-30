@@ -199,6 +199,10 @@ function Row(props) {
       });
     }
   };
+  const bidClose = () => {
+    props.bidClose();
+    setDialog({openDialog: false})
+  };
   const formatter = buildFormatter(englishStrings)
   return (
     <React.Fragment>
@@ -208,13 +212,14 @@ function Row(props) {
         close = {closeDialogHandle} 
         order = {state.order}
         color={props.color} 
+        bidSuccess={props.bidSuccess}
         makeBid={createBidHandler}   
         loading={props.loading}  
         error={props.error}    
-      />) : props.bidSuccess && !stateDialog.congzDialog ? (
+      />) : props.bidSuccess ? (
         <CongzDialog
-          open={() => setDialog({congzDialog: !stateDialog.congzDialog})}
-          close={() => setDialog({congzDialog: !stateDialog.congzDialog})}
+          open={props.bidSuccess}
+          close={bidClose}
           bid={props.bidSuccess}
         />
       ) : null}
@@ -246,7 +251,7 @@ function Row(props) {
           </TableCell>
         </TableRow>,
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
           {open.stateOpen && open.stateId === item._id ? (
             <Collapse in={open} timeout="auto" unmountOnExit id={id}>
               <Box margin={1}>
@@ -324,6 +329,7 @@ export default function OrdersTable(props) {
               loading={props.loading}
               error={props.error}
               bidSuccess={props.bidSuccess}
+              bidClose={props.bidClose}
               />
         </TableBody>
         <TableFooter>

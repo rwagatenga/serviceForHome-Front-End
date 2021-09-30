@@ -82,13 +82,12 @@ function ViewBids(props) {
   const initData = [];
   React.useEffect(() => {
     props.onFetchOrders(props.userId, props.userId);
-  }, []);
+  }, [props.bidSuccess]);
 
   const handleServiceChange = (event) => {
     let findBid = props.orders.find((item) => item._id === event.target.value);
     setOrderId(findBid._id);
   };
-  
   const formatter = buildFormatter(englishStrings)
   return (
     <GridContainer>
@@ -129,6 +128,8 @@ function ViewBids(props) {
               colors={classes.button}
               adminView = "admin"
               orderId = {orderId}
+              bidError={props.error}
+              bidSuccess={props.bidSuccess}
             />
           </CardBody>
         </Card>
@@ -140,7 +141,7 @@ function ViewBids(props) {
 const mapStateToProps = state => {
     return {
         loading: state.auth.loading,
-        error: state.bid.error,
+        error: state.order.error,
         isAuthenticated: state.auth.token !== null,
         authRedirectPath: state.auth.authRedirectPath,
         services: state.service.services,

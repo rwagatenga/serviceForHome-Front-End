@@ -1,28 +1,28 @@
-import * as actionTypes from './actionTypes.js';
+import * as actionTypes from "./actionTypes.js";
 
 export const serviceStart = () => {
-    return {
-        type: actionTypes.SERVICE_START
-    };
+	return {
+		type: actionTypes.SERVICE_START,
+	};
 };
 
 export const fetchServiceSuccess = (services) => {
 	return {
 		type: actionTypes.FETCH_SERVICES,
-		services: services
-	}
-}
+		services: services,
+	};
+};
 export const fetchServiceFail = (error) => {
 	return {
 		type: actionTypes.SERVICE_FAIL,
-		error: error
-	}
-}
+		error: error,
+	};
+};
 export const initServices = () => {
-	return dispatch => {
+	return (dispatch) => {
 		dispatch(serviceStart());
 		const serviceQuery = {
-      query: ` 
+			query: ` 
         {
           viewServices {
             services {
@@ -32,32 +32,37 @@ export const initServices = () => {
                 _id
                 subServiceName
                 price
+                serviceId {
+                  _id
+                }
               }
             }
           }
         }
-      `
-    };
-    fetch("http://localhost:8080/graphql", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(serviceQuery)
-      })
-      .then(res => {
-        return res.json();
-      })
-      .then(resData => {
-        if (!resData.data) {
-          let message = "Check Your Internet Connection";
-          dispatch(fetchServiceFail(message));
-        }
-        dispatch(fetchServiceSuccess(resData.data.viewServices.services))
-      })
-      .catch(err => {
-      	dispatch(fetchServiceFail());
-        // console.log(err);
-      });
-	}
-}
+      `,
+		};
+		fetch("http://localhost:8080/graphql", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(serviceQuery),
+		})
+			.then((res) => {
+				return res.json();
+			})
+			.then((resData) => {
+				if (!resData.data) {
+					let message = "Check Your Internet Connection";
+					dispatch(fetchServiceFail(message));
+				}
+				dispatch(
+					fetchServiceSuccess(resData.data.viewServices.services)
+				);
+			})
+			.catch((err) => {
+				dispatch(fetchServiceFail());
+				// console.log(err);
+			});
+	};
+};
