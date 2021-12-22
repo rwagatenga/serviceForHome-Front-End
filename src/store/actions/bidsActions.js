@@ -38,7 +38,11 @@ export const createBidFail = (error) => {
 		error: error
 	}
 };
-
+export const bidClose = () => {
+	return {
+		type: actionTypes.BID_CLOSE
+	}
+};
 export const createBid = (orderId, workerId, bidInput) => {
 	return dispatch => {
 		dispatch(bidsStart());
@@ -86,6 +90,46 @@ export const createBid = (orderId, workerId, bidInput) => {
 		}
 	};
 
+export const acceptBid = (id) => {
+	return dispatch => {
+		dispatch(bidsStart());
+		const acceptQuery = {
+			query: `
+			mutation acceptBid($_id: ID!){
+				acceptBid(_id: $_id) {
+					_id
+				}
+			}`,
+			variables : {
+				_id: id
+			}
+		};
+		fetch('http://localhost:8080/graphql', {
+			method: 'POST',
+			headers: {
+	      'Content-Type': 'application/json'
+	    },
+	    body: JSON.stringify(acceptQuery)
+		})
+		.then((res) => {
+			return res.json();
+		})
+		.then((resData) => {
+			if (resData.errors) {
+				if (resData.errors[0].message.match(/getaddrinfo ENOTFOUND/g)) {
+	        let message = "Check Your Internet Connection";
+	        dispatch(createBidFail(message));
+	      }
+	      dispatch(createBidFail(resData.errors[0].message));
+	    } else {
+        dispatch(createBidSuccess());
+      }
+		})
+		.catch((err) => {
+			dispatch(createBidFail(err))
+		})
+	}	
+};
 export const initBids = (userId, offerId) => {
 	return dispatch => {
 		if (offerId) {
@@ -115,6 +159,7 @@ export const initBids = (userId, offerId) => {
 					      lastName
 					      email
 					      sex
+					      telephone
 					      address {
 						      district
 						      sector

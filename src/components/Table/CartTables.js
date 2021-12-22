@@ -12,8 +12,8 @@ export default function CustomEditComponent(props) {
   const { useState } = React;
 
   const [columns, setColumns] = useState([
-    { title: 'Service Name', field: 'serviceId', editable: 'never'},
-    { title: 'Sub-Service Name', field: 'subServiceId', editable: 'never'},
+    { title: 'Service Name', field: 'service', editable: 'never'},
+    { title: 'Sub-Service Name', field: 'subService', editable: 'never'},
     { title: 'Price', field: 'price'},
     {
       title: 'Duration', field: 'duration',
@@ -22,7 +22,7 @@ export default function CustomEditComponent(props) {
             id="datetime-local"
             label="Date and Time"
             type="datetime-local"
-            defaultValue={new Date(props.tableTest.map(item => item.price)).toDateInputValue()}
+            defaultValue={new Date().toDateInputValue()}
             onChange={e => props.onChange(e.target.value)}
             //onChange={handleChange('duration')}
             value={props.value}
@@ -39,27 +39,22 @@ export default function CustomEditComponent(props) {
   ]);
 
   const [data, setData] = useState([
-    props.tableTest.map(item => ({
-      clientId: '',
-      serviceId: '',
-      subServiceId: '',
-      price: '',
-      duration: '',
-      description: ''
-    }))
+  
   ]);
-  return (
+  const updateCartHandler = (cartData) => {
+    const cartInputs = {...cartData};
+    props.updateCart(cartInputs[0]);
+  }
+  return ([
+    console.log(data),
     <MaterialTable
       title="List of Orders in Your Cart"
       columns={columns}
-      data={props.tableData.map(prop => prop.orders.map(item => ({
-        serviceId: item.serviceId.map(prop => prop.serviceName),
-        subServiceId: item.subServiceId.map(prop => prop.subServiceName),
-        price: item.price,
-        duration: item.duration,
-        description: item.description
-      })))}
+      data={props.tableData}
       options={{
+        tableStyle: {
+          height: 150
+        },
         rowStyle: {
           fontSize: 15,
           fontFamily: 'cursive',
@@ -82,7 +77,7 @@ export default function CustomEditComponent(props) {
               const index = oldData.tableData.id;
               dataUpdate[index] = newData;
               setData([...dataUpdate]);
-
+              updateCartHandler(dataUpdate);
               resolve();
             }, 1000)
           }),
@@ -98,6 +93,6 @@ export default function CustomEditComponent(props) {
             }, 1000)
           }),
       }}
-    />
+    />]
   )
 }

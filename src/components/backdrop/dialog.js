@@ -35,19 +35,34 @@ export default function dialog(props) {
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">{"Terms and Agreement"}</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-title">{props.delete ? "Are you Sure ?" : "Terms and Agreement"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-          Dear Sir <b>Name</b>, Here are terms and agreement you have to agree so that we can work together.<br/>Do you agree, will you:<br/><b><i>1. Pay service fee (500frw) on any job request we will give you?<br/>2. Provide a good service to the customers we will give you?<br/>3. Always try to do not expose high price to the clients we will give you?<br/>4. Always try to be on time to respond clients request?<br/></i></b>
-          </DialogContentText>
+          {props.delete ? (
+            <DialogContentText id="alert-dialog-slide-description">
+            Do You Want to Delete this Order in Your Cart ?
+            </DialogContentText>
+            ) : (
+            <DialogContentText id="alert-dialog-slide-description">
+            Dear Sir <b>Name</b>, Here are terms and agreement you have to agree so that we can work together.<br/>Do you agree, will you:<br/><b><i>1. Pay service fee (500frw) on any job request we will give you?<br/>2. Provide a good service to the customers we will give you?<br/>3. Always try to do not expose high price to the clients we will give you?<br/>4. Always try to be on time to respond clients request?<br/></i></b>
+            </DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
-        <Button onClick={props.errors? props.onCancelModal : props.clickDisagree} color="primary">
-            Disagree
+        {props.delete ? ([
+          <Button onClick={props.no} color="primary">
+            No
+          </Button>,
+          <Button onClick={props.yes} color="primary">
+            Yes
           </Button>
+        ]) : ([
+          <Button onClick={props.errors? props.onCancelModal : props.clickDisagree} color="primary">
+            Disagree
+          </Button>,
           <Button onClick={props.errors? props.onHandle : props.clickAgree} color="primary">
             Agree
           </Button>
+        ])}
         </DialogActions>
       </Dialog>
     </div>
