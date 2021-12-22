@@ -11,7 +11,9 @@ import Container from '@material-ui/core/Container';
 import Menu from './components/menu/Menu';
 // core components
 import Admin from "layouts/Admin.js";
+import Client from "layouts/Client.js"
 import RTL from "layouts/RTL.js";
+import ClientRTL from "layouts/ClientRTL.js"
 import * as actions from './store/actions/index';
 
 import "assets/css/material-dashboard-react.css?v=1.9.0";
@@ -28,6 +30,7 @@ class App extends Component {
   componentDidMount () {
     this.props.onTryAutoSignup();
   }
+  
   render() {
     let apps = (
       <Router history={hist}>
@@ -38,8 +41,19 @@ class App extends Component {
         </Switch>
       </Router>
     );
-    if (this.props.isAuthenticated) {
-      return apps
+    if (this.props.isAuthenticated && this.props.userType === "Worker") {
+      return (apps)
+    }
+    if (this.props.isAuthenticated && this.props.userType === "Client") {
+      return (
+			<Router history={hist}>
+				<Switch>
+					<Route path="/admin" component={Client} />
+					<Route path="/rtl" component={ClientRTL} />
+					<Redirect from="/" to="/admin/dashboard" />
+				</Switch>
+			</Router>
+		);
     }
     apps = (
       <div style={{backgroundColor: "#0E3D51", color: "white"}}>
@@ -60,7 +74,8 @@ class App extends Component {
 }
 const mapStateToProps = state => {
   return {
-    isAuthenticated: state.auth.token !== null
+    isAuthenticated: state.auth.token !== null,
+    userType: state.auth.user.userType
   };
 };
 
