@@ -63,7 +63,7 @@ export const createBid = (orderId, workerId, bidInput) => {
 					}
 				}
 			};
-			fetch('http://localhost:8080/graphql', {
+			fetch(actionTypes.URL, {
 				method: 'POST',
 				headers: {
 	         'Content-Type': 'application/json'
@@ -104,7 +104,7 @@ export const acceptBid = (id) => {
 				_id: id
 			}
 		};
-		fetch('http://localhost:8080/graphql', {
+		fetch(actionTypes.URL, {
 			method: 'POST',
 			headers: {
 	      'Content-Type': 'application/json'
@@ -183,7 +183,7 @@ export const initBids = (userId, offerId) => {
 					}
 				}`
 		  };
-		  fetch("http://localhost:8080/graphql", {
+		  fetch(actionTypes.URL, {
 		    method: 'POST',
 		    headers: {
 		      'Content-Type': 'application/json'

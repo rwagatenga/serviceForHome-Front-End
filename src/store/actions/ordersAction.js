@@ -66,7 +66,7 @@ export const createOrder = (clientId, inputs) => {
 				}
 			}
       };
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 	      method: 'POST',
 	      headers: {
 	         'Content-Type': 'application/json'
@@ -132,7 +132,7 @@ export const initOrders = (userId) => {
 					}
 	    		}`
 			};
-	    fetch("http://localhost:8080/graphql", {
+	    fetch(actionTypes.URL, {
 	        method: 'POST',
 	        headers: {
 	          'Content-Type': 'application/json'
@@ -192,7 +192,7 @@ export const yourOrders = (userId, yourId) => {
 					}
 	    		}`
 			};
-	    fetch("http://localhost:8080/graphql", {
+	    fetch(actionTypes.URL, {
 	        method: 'POST',
 	        headers: {
 	          'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ export const cartOrder = (clientId, cartId) => {
 				cartId: cartId
 			}
 		};
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 	      method: 'POST',
 	      headers: {
 	         'Content-Type': 'application/json'

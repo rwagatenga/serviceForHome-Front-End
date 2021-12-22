@@ -49,3 +49,6 @@ export const BID_FAIL = "BID_FAIL";
 export const CREATE_BID_SUCCESS = "CREATE_BID_SUCCESS";
 export const CREATE_BID_FAIL = "CREATE_BID_FAIL";
 export const BID_CLOSE = "BID_CLOSE";
+
+// URL
+export const URL = "http://localhost:8080";

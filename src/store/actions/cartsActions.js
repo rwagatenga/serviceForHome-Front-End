@@ -79,7 +79,7 @@ export const createCart = (clientId, cartInputs) => {
 				},
 			},
 		};
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -144,7 +144,7 @@ export const initCarts = (userId) => {
 					}
 				}`,
 			};
-			fetch("http://localhost:8080/graphql", {
+			fetch(actionTypes.URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -210,7 +210,7 @@ export const updateCart = (cartId, cartInputs) => {
 				},
 			},
 		};
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -273,7 +273,7 @@ export const deleteCart = (clientId, cartId, serviceId, subServiceId) => {
 				subServiceId: subServiceId,
 			},
 		};
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
