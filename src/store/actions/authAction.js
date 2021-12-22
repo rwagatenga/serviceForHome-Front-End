@@ -109,7 +109,6 @@ export const auth = (email, password) => {
 				return res.json();
 			})
 			.then((response) => {
-				console.log("U", response)
 				if (response.errors) {
 					if (
 						response.errors[0].message.match(
@@ -136,11 +135,12 @@ export const auth = (email, password) => {
 						"users",
 						JSON.stringify(response.data.login.users[0])
 					);
+					
 					dispatch(
 						authSuccess(
 							response.data.login.token,
 							response.data.login.userId,
-							response.data.login.users[0]
+							response.data.login.users[0],
 						)
 					);
 					dispatch(checkAuthTimeout(response.data.login.expiresIn));

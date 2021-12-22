@@ -80,14 +80,6 @@ const dashboardRoutes = [
 	//   component: TableList,
 	//   layout: "/admin"
 	// },
-	{
-		path: "/vieworders",
-		name: "View Orders",
-		rtlName: "Reba Zatumijwe",
-		icon: ViewListIcon,
-		component: ViewOrders,
-		layout: "/admin",
-	},
 	// {
 	//   path: "/bid",
 	//   name: "Bid Service",
