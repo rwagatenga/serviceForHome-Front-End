@@ -98,7 +98,7 @@ export const auth = (email, password) => {
 				password: authData.password,
 			},
 		};
-		fetch("http://localhost:8080/graphql", {
+		fetch(actionTypes.URL, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -109,6 +109,7 @@ export const auth = (email, password) => {
 				return res.json();
 			})
 			.then((response) => {
+				console.log("U", response)
 				if (response.errors) {
 					if (
 						response.errors[0].message.match(
@@ -229,7 +230,7 @@ export const createAccount = (
 					},
 				},
 			};
-			fetch("http://localhost:8080/graphql", {
+			fetch(actionTypes.URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -342,7 +343,7 @@ export const createAccount = (
 					negotiate: userInput.negotiate,
 				},
 			};
-			fetch("http://localhost:8080/graphql", {
+			fetch(actionTypes.URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -450,7 +451,7 @@ export const updateUserAccount = (
 					},
 				},
 			};
-			fetch("http://localhost:8080/graphql", {
+			fetch(actionTypes.URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -540,7 +541,7 @@ export const updateUserAccount = (
 					},
 				},
 			};
-			fetch("http://localhost:8080/graphql", {
+			fetch(actionTypes.URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
