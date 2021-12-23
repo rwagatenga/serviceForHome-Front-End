@@ -34,12 +34,13 @@ class Home extends Component {
 		if (this.props.authRedirectPath !== '/' ) {
             this.props.onSetAuthRedirectPath();
         }
-       	this.props.onFetchServices();
+		this.props.onFetchServices();
+		this.props.onDetectingLocation();
 	}
 	loginHandler = (event, authData) => {
     event.preventDefault();
     // this.setState({authLoading: !this.state.authLoading});
-    this.props.onAuth( authData.email, authData.password );
+    this.props.onAuth( authData.email, authData.password, this.props.location);
   	};
   	signupHandler = (event, data) => {
   		event.preventDefault();
@@ -52,7 +53,9 @@ class Home extends Component {
   			province: data.province, 
   			district: data.district, 
   			sector: data.sector,
-  			password: data.password
+  			password: data.password,
+			location: {...this.props.location}
+			
   		}
   		this.props.onCreateAccount(token, experesIn, serviceId, subServiceId, inputs);
   	}
@@ -145,17 +148,34 @@ const mapStateToProps = state => {
         error: state.auth.error,
         isAuthenticated: state.auth.token !== null,
         authRedirectPath: state.auth.authRedirectPath,
-        services: state.service.services
+		services: state.service.services,
+		location: state.auth.location
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: ( email, password ) => dispatch( actions.auth( email, password ) ),
-        onCreateAccount: (token, experesIn, serviceId, subServiceId, userInputs) => dispatch(actions.createAccount(token, experesIn, serviceId, subServiceId, userInputs)),
-        onSetAuthRedirectPath: () => dispatch( actions.setAuthRedirectPath( '/' ) ),
-        onCancel: () => dispatch( actions.onCancel() ),
-        onFetchServices: () => dispatch(actions.initServices())
-    };
+		onAuth: (email, password, location) => dispatch(actions.auth(email, password, location)),
+		onCreateAccount: (
+			token,
+			experesIn,
+			serviceId,
+			subServiceId,
+			userInputs
+		) =>
+			dispatch(
+				actions.createAccount(
+					token,
+					experesIn,
+					serviceId,
+					subServiceId,
+					userInputs
+				)
+			),
+		onSetAuthRedirectPath: () => dispatch(actions.setAuthRedirectPath("/")),
+		onCancel: () => dispatch(actions.onCancel()),
+		onFetchServices: () => dispatch(actions.initServices()),
+		onDetectingLocation: () => dispatch(actions.detectLocation()),
+	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

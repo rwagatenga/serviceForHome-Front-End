@@ -22,6 +22,12 @@ export const authSuccess = (token, userId, user) => {
 		user: user,
 	};
 };
+export const locationSuccess = (location) => {
+	return {
+		type: actionTypes.LOCATION,
+		location: location
+	}
+}
 export const onUpdateSuccess = () => {
 	return {
 		type: actionTypes.UPDATE_SUCCESS,
@@ -51,8 +57,20 @@ export const checkAuthTimeout = (expirationTime) => {
 		}, expirationTime * 1000);
 	};
 };
-
-export const auth = (email, password) => {
+export const detectLocation = () => {
+	return (dispatch) => {
+		let location;
+		navigator.geolocation.getCurrentPosition(function (position) {
+			location = {
+				latitude: position.coords.latitude,
+				longitude: position.coords.longitude,
+			};
+			dispatch(locationSuccess(location));
+		});
+	};
+};
+export const auth = (email, password, location) => {
+	console.log("LOCATION", location)
 	return (dispatch) => {
 		dispatch(authStart());
 		const authData = {
@@ -63,8 +81,8 @@ export const auth = (email, password) => {
 
 		const graphqlQuery = {
 			query: `
-            query UserLogin($email: String!, $password: String!) {
-              login(email: $email, password: $password) {
+            query UserLogin($email: String!, $password: String!, $location: LocationInput!) {
+              login(email: $email, password: $password, location: $location) {
                 token
                 userId
                 userType
@@ -96,6 +114,7 @@ export const auth = (email, password) => {
 			variables: {
 				email: authData.email,
 				password: authData.password,
+				location: location,
 			},
 		};
 		fetch(actionTypes.URL, {
@@ -588,3 +607,4 @@ export const updateUserAccount = (
 		}
 	};
 };
+

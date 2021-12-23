@@ -6,6 +6,7 @@ export {
 	authCheckState,
 	createAccount,
 	updateUserAccount,
+	detectLocation,
 } from "./authAction";
 
 export { fetchServiceFail, initServices } from "./serviceAction";

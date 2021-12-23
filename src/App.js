@@ -29,6 +29,7 @@ class App extends Component {
   };
   componentDidMount () {
     this.props.onTryAutoSignup();
+    this.props.onDetectingLocation()
   }
   
   render() {
@@ -75,13 +76,15 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     isAuthenticated: state.auth.token !== null,
-    userType: state.auth.user.userType
+    userType: state.auth.user.userType,
+    location: state.auth.location
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onTryAutoSignup: () => dispatch( actions.authCheckState() ),
+    onTryAutoSignup: () => dispatch(actions.authCheckState()),
+    onDetectingLocation: () => dispatch(actions.detectLocation())
   };
 };
 export default connect( mapStateToProps, mapDispatchToProps )( App );

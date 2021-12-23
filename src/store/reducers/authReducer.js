@@ -5,6 +5,7 @@ const initialState = {
 	token: null,
 	userId: null,
 	user: {},
+	location: {},
 	error: null,
 	loading: false,
 	authRedirectPath: "/",
@@ -31,6 +32,13 @@ const authSuccess = (state, action) => {
 		success: true,
 	});
 };
+
+const locationSuccess = (state, action) => {
+	return updateObject(
+		state, {
+		location: {...action.location }
+	});
+}
 
 const onCancel = (state, action) => {
 	return updateObject(state, {
@@ -84,6 +92,8 @@ const reducer = (state = initialState, action) => {
 			return setAuthRedirectPath(state, action);
 		case actionTypes.UPDATE_SUCCESS:
 			return onUpdateSuccess(state, action);
+		case actionTypes.LOCATION:
+			return locationSuccess(state, action);
 		default:
 			return state;
 	}
