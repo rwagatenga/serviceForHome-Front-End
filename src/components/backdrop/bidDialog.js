@@ -151,129 +151,164 @@ export default function ProfileDialog(props) {
   };
 
   return (
-    <div>
-      {/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>
+		<div>
+			{/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Open responsive dialog
-      </Button>*/}     
-      <Dialog
-        //fullScreen={fullScreen}
-        TransitionComponent={Transition}
-        keepMounted
-        open={props.open}
-        onClose={props.close}
-        aria-labelledby="Profile Dialog"
-      >
-        <DialogTitle id="responsive-dialog-title">
-          <div className={classes.root}>
-            Dear Sir {props.firstName} Fill This Form To Bid this Service
-          </div>
-          </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {props.loading ? (<Backdrop open={props.loading} clicked={props.onCancel} />) : null }
+      </Button>*/}
+			<Dialog
+				//fullScreen={fullScreen}
+				TransitionComponent={Transition}
+				keepMounted
+				open={props.open}
+				onClose={props.close}
+				aria-labelledby="Profile Dialog">
+				<DialogTitle id="responsive-dialog-title">
+					<div className={classes.root}>
+						Dear Sir {props.firstName} Fill This Form To Bid this
+						Service
+					</div>
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						{props.loading ? (
+							<Backdrop
+								open={props.loading}
+								clicked={props.onCancel}
+							/>
+						) : null}
 
-            {props.order ? (
-              <table>
-                <tr>
-                  <th align="left">Created At: </th>
-                  <td align="right">
-                    <Info><TimeAgo date={props.order.createdAt} formatter={formatter}/></Info>
-                  </td>
-                </tr>
-                <tr> 
-                  <th align="left">Ordered Date: </th>
-                  <td align="right">
-                    <Warning><TimeAgo date={props.order.duration} formatter={formatter}/></Warning>
-                  </td>
-                </tr>
-                <tr>
-                  <th align="left">Ordered Price: </th>
-                  <td align="right">
-                    <Info>{props.order.price} frw</Info>
-                  </td>
-                </tr>
-              </table>
-            ) : null }
-            {props.error ? (
-              <table>
-                <tr>
-                  <td align="left">Error: </td>
-                  <td align="right"><Danger><b style={{fontSize: 16}}>{props.error}</b></Danger></td>
-                </tr>
-              </table>
-            ) : success ? (
-              <table>
-                <tr>
-                  <td align="left">Error: </td>
-                  <td>{success}</td>
-                </tr>
-              </table>
-            ) : null }
-            <form onSubmit={e =>
-              createBid(e, {
-                  orderId: props.order._id,
-                  bidInputs: values
-                })
-              }
-            >
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField 
-                    id="price" 
-                    label="What is your Estimated Price" 
-                    name="price"
-                    onChange={handleChange('price')}
-                    value={values.price}                
-                    //placeholder={data.map(item => item.price)}
-                  />
-                  <FormHelperText id="component-helper-text">Must be a Number</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField
-                    id="datetime-local"
-                    label="Date and Time"
-                    type="datetime-local"
-                    defaultValue={new Date().toDateInputValue()}
-                    onChange={handleChange('duration')}
-                    value={values.duration}
-                    name="duration"
-                    className={classes.textField}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField 
-                    id="description" 
-                    label="description" 
-                    placeholder="Description"
-                    multiline
-                    onChange={handleChange('description')}
-                    value={values.description}
-                    name="description"/>
-                </FormControl>
-              </Grid><br/><br/>
-              <Button type = "submit" variant="contained" className={props.color} loading={props.loading}>
-                Order
-              </Button>
-            </form>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          {/*<Button autoFocus onClick={props.close} color="primary">
+						{props.order ? (
+							<table>
+								<tr>
+									<th align="left">Created At: </th>
+									<td align="right">
+										<Info>
+											<TimeAgo
+												date={props.order.createdAt}
+												formatter={formatter}
+											/>
+										</Info>
+									</td>
+								</tr>
+								<tr>
+									<th align="left">Ordered Date: </th>
+									<td align="right">
+										<Warning>
+											<TimeAgo
+												date={props.order.duration}
+												formatter={formatter}
+											/>
+										</Warning>
+									</td>
+								</tr>
+								<tr>
+									<th align="left">Ordered Price: </th>
+									<td align="right">
+										<Info>{props.order.price} frw</Info>
+									</td>
+								</tr>
+							</table>
+						) : null}
+						{props.error ? (
+							<table>
+								<tr>
+									<td align="left">Error: </td>
+									<td align="right">
+										<Danger>
+											<b style={{ fontSize: 16 }}>
+												{props.error}
+											</b>
+										</Danger>
+									</td>
+								</tr>
+							</table>
+						) : success ? (
+							<table>
+								<tr>
+									<td align="left">Error: </td>
+									<td>{success}</td>
+								</tr>
+							</table>
+						) : null}
+						<form
+							onSubmit={(e) =>
+								createBid(e, {
+									orderId: props.order._id,
+									bidInputs: values,
+								})
+							}>
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="price"
+										label="What is your Estimated Price"
+										name="price"
+										onChange={handleChange("price")}
+										value={values.price}
+										//placeholder={data.map(item => item.price)}
+									/>
+									<FormHelperText id="component-helper-text">
+										Must be a Number
+									</FormHelperText>
+								</FormControl>
+							</Grid>
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="datetime-local"
+										label="Date and Time"
+										type="datetime-local"
+										defaultValue={new Date().toDateInputValue()}
+										onChange={handleChange("duration")}
+										value={values.duration}
+										name="duration"
+										className={classes.textField}
+										InputLabelProps={{
+											shrink: true,
+											min: "2021-12-21",
+										}}
+										inputProps={{
+											// only needs the first 16 characters in the date string
+											min: new Date().getTime() + 30*60000
+										}}
+									/>
+								</FormControl>
+							</Grid>
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="description"
+										label="description"
+										placeholder="Description"
+										multiline
+										onChange={handleChange("description")}
+										value={values.description}
+										name="description"
+									/>
+								</FormControl>
+							</Grid>
+							<br />
+							<br />
+							<Button
+								type="submit"
+								variant="contained"
+								className={props.color}
+								loading={props.loading}>
+								Order
+							</Button>
+						</form>
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					{/*<Button autoFocus onClick={props.close} color="primary">
             Disagree
           </Button>*/}
-          <Button onClick={props.close} color="primary" autoFocus>
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+					<Button onClick={props.close} color="primary" autoFocus>
+						Cancel
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</div>
   );
 }
 

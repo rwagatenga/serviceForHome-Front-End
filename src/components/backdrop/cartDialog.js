@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import moment from "moment";
 import { makeStyles } from "@material-ui/core/styles";
 import { Alert, AlertTitle } from '@material-ui/lab';
 import Button from '@material-ui/core/Button';
@@ -136,100 +137,132 @@ function ProfileDialog(props) {
   };
 
   return (
-    <div>
-      {/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>
+		<div>
+			{/*<Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Open responsive dialog
-      </Button>*/}     
-        <Dialog
-        //fullScreen={fullScreen}
-        TransitionComponent={Transition}
-        keepMounted
-        open={props.open}
-        onClose={props.close}
-        aria-labelledby="Profile Dialog"
-      >
-        <DialogTitle id="responsive-dialog-title">
-          <div className={classes.root}>
-            Dear Sir {props.firstName} Fill This Form To add this Service to Your Cart
-          </div>
-          </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {props.error ? (
-              <table>
-                <tr>
-                  <td align="left">Error: </td>
-                  <td align="right"><Danger><b style={{fontSize: 16}}>{props.error}</b></Danger></td>
-                </tr>
-              </table>
-            ) : null }
-            <form onSubmit={e => createCart(e, {
-                orderInputs: values,
-                serviceId: props.service.map(item => item._id),
-                subServiceId: props.subService.map(item => item._id)
-              })
-            }>
-            {props.loading ? (<Backdrop open={props.loading} clicked={props.onCancel} />) : null } 
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField 
-                    id="price" 
-                    label="Estimated Price" 
-                    name="price"
-                    onChange={handleChange('price')}
-                    value={values.price}                
-                    //placeholder={data.map(item => item.price)}
-                  />
-                  <FormHelperText id="component-helper-text">Must be a Number</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField
-                    id="datetime-local"
-                    label="Date and Time"
-                    type="datetime-local"
-                    minDate={new Date().toDateInputValue()}
-                    defaultValue={new Date().toDateInputValue()}
-                    onChange={handleChange('duration')}
-                    value={values.duration}
-                    name="duration"
-                    className={classes.textField}
-                    InputLabelProps={{
-                      shrink: true,
-                      min: new Date().toDateInputValue()
-                    }}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item className="gridItem" xs={6}>
-                <FormControl className={classes.formControl}>
-                  <TextField 
-                    id="description" 
-                    label="description" 
-                    placeholder="Description"
-                    multiline
-                    onChange={handleChange('description')}
-                    value={values.description}
-                    name="description"/>
-                </FormControl>
-              </Grid><br/><br/>
-              <Button type = "submit" variant="contained" className={props.color} loading={props.loading}>
-                Add To Cart
-              </Button>
-            </form>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          {/*<Button autoFocus onClick={props.close} color="primary">
+      </Button>*/}
+			<Dialog
+				//fullScreen={fullScreen}
+				TransitionComponent={Transition}
+				keepMounted
+				open={props.open}
+				onClose={props.close}
+				aria-labelledby="Profile Dialog">
+				<DialogTitle id="responsive-dialog-title">
+					<div className={classes.root}>
+						Dear Sir {props.firstName} Fill This Form To add this
+						Service to Your Cart
+					</div>
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						{props.error ? (
+							<table>
+								<tr>
+									<td align="left">Error: </td>
+									<td align="right">
+										<Danger>
+											<b style={{ fontSize: 16 }}>
+												{props.error}
+											</b>
+										</Danger>
+									</td>
+								</tr>
+							</table>
+						) : null}
+						<form
+							onSubmit={(e) =>
+								createCart(e, {
+									orderInputs: values,
+									serviceId: props.service.map(
+										(item) => item._id
+									),
+									subServiceId: props.subService.map(
+										(item) => item._id
+									),
+								})
+							}>
+							{props.loading ? (
+								<Backdrop
+									open={props.loading}
+									clicked={props.onCancel}
+								/>
+							) : null}
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="price"
+										label="Estimated Price"
+										name="price"
+										onChange={handleChange("price")}
+										value={values.price}
+										//placeholder={data.map(item => item.price)}
+									/>
+									<FormHelperText id="component-helper-text">
+										Must be a Number
+									</FormHelperText>
+								</FormControl>
+							</Grid>
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="datetime-local"
+										label="Date and Time"
+										type="datetime-local"
+										minDate={new Date().toDateInputValue()}
+										defaultValue={new Date().toDateInputValue()}
+										onChange={handleChange("duration")}
+										value={values.duration}
+										name="duration"
+										className={classes.textField}
+										InputLabelProps={{
+											shrink: true,
+											min: new Date().toDateInputValue(),
+										}}
+										inputProps={{
+											// only needs the first 16 characters in the date string
+											min: new Date()
+												.toISOString()
+												.slice(0, 16),
+										}}
+									/>
+								</FormControl>
+							</Grid>
+							<Grid item className="gridItem" xs={6}>
+								<FormControl className={classes.formControl}>
+									<TextField
+										id="description"
+										label="description"
+										placeholder="Description"
+										multiline
+										onChange={handleChange("description")}
+										value={values.description}
+										name="description"
+									/>
+								</FormControl>
+							</Grid>
+							<br />
+							<br />
+							<Button
+								type="submit"
+								variant="contained"
+								className={props.color}
+								loading={props.loading}>
+								Add To Cart
+							</Button>
+						</form>
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					{/*<Button autoFocus onClick={props.close} color="primary">
             Disagree
           </Button>*/}
-          <Button onClick={props.close} color="primary" autoFocus>
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+					<Button onClick={props.close} color="primary" autoFocus>
+						Cancel
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</div>
   );
 }
 
