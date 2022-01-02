@@ -269,7 +269,9 @@ export default function ProfileDialog(props) {
 										}}
 										inputProps={{
 											// only needs the first 16 characters in the date string
-											min: new Date().getTime() + 30*60000
+											min: new Date()
+												.toISOString()
+												.slice(0, 16),
 										}}
 									/>
 								</FormControl>

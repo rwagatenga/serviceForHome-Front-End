@@ -135,9 +135,9 @@ export const initBids = (userId, offerId) => {
 		if (offerId) {
 			dispatch(bidsStart());
 			const bidsQuery = {
-		    query:  `
+				query: `
 		    {
-			    viewOfferBids(clientId: "${userId}", offerId: "${offerId}") {
+			    viewOfferBids(clientId: "${ userId }", offerId: "${ offerId }") {
 					  offerBid {
 					    _id
 					    orderId {
@@ -182,28 +182,30 @@ export const initBids = (userId, offerId) => {
 					   
 					}
 				}`
-		  };
-		  fetch(actionTypes.URL, {
-		    method: 'POST',
-		    headers: {
-		      'Content-Type': 'application/json'
-		    },
-		    body: JSON.stringify(bidsQuery)
-		  })
-		  .then(res => {
-		    return res.json();
-		  })
-		  .then(resData => {
-		    if (resData.errors && resData.errors[0].status === 401) {
-		      dispatch(bidsFail(resData.errors[0].message));	
-		    } else {
-		      dispatch(bidsSuccess(resData.data.viewOfferBids.offerBid));
-		    }
-		  })
-		  .catch(err => {
-		    dispatch(bidsFail(err));
-		        // console.log(err);
-		  });
+			};
+			fetch(actionTypes.URL, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(bidsQuery)
+			})
+			.then(res => res.json())
+			.then(resData => {
+				dispatch(bidsSuccess(resData.data.viewOfferBids.offerBid));
+				// if (resData.errors || resData.errors.length > 0 || resData.errors[0].status === 401) {
+				// 	alert("FAIL");
+				// 	// dispatch(bidsFail(resData.errors[0].message))
+				// }
+				// else { alert("DONE"); }
+				// else {
+				// 	alert("false")
+				// 	console.log("BIDDED", resData.data.viewOfferBids.offerBid)
+				// 	dispatch(bidsSuccess(resData.data.viewOfferBids.offerBid));
+				// }
+				// dispatch(bidsSuccess(resData.data.viewOfferBids.offerBid));
+			})
+			.catch(err => dispatch(bidsFail(err)))
 		}
 	}
 		

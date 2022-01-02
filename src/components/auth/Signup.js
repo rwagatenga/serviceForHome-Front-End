@@ -35,6 +35,7 @@ import Dialog from '../backdrop/dialog';
 import './auth.css';
 import Login from './Login';
 import App from '../../App';
+import ErrorHandler  from 'components/ErrorHandler/ErrorHandler';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -104,6 +105,10 @@ export default function Signup(props) {
     password: '',
     showPassword: false,
   });
+  const [cPass, setCPass] = React.useState({
+    confirm_password: '',
+    showPassword: false
+  });
   // const [userInput, setUserInput] = React.useReducer(
   //   (state, newState) => ({...state, ...newState}),
   //   {
@@ -136,10 +141,11 @@ export default function Signup(props) {
   });
   const [stateErrors, setErrors] = React.useState([]);
   const [stateResults, setResults] = React.useState([]);
+  const [error, setError] = React.useState('')
   let dataError = [];
-  let serviceData= []
-  const API_URL = 'http://localhost:8080/graphql';
-
+  let serviceData = []
+  const API_URL = 'http://localhost:8080';
+  
   React.useEffect(() => {
     const serviceQuery = {
       query: ` 
@@ -201,6 +207,9 @@ export default function Signup(props) {
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
+   const handlePasswordChange = (prop) => (event) => {
+		setCPass({ ...cPass, [prop]: event.target.value });
+   };
   // const handleSexChange = (event) => {
   //   setSex(event.target.value);
   // };
@@ -238,6 +247,10 @@ export default function Signup(props) {
     setValues({ ...values, showPassword: !values.showPassword });
   };
 
+  const handleClickShowCPassword = () => {
+		setCPass({ ...cPass, showPassword: !cPass.showPassword });
+  };
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
@@ -256,6 +269,10 @@ export default function Signup(props) {
     });
   };
   const submitData = async (event) => {
+    if (values.password !== cPass.confirm_password) {
+      setError("Password are not match with Confirm Passoword")
+    }
+   
     props.onSignUp(event, {
       token: userInput.email,
       experesIn: userInput.email,
@@ -726,81 +743,118 @@ const step2 = <Grid container spacing={1} alignItems="flex-end" className="gridA
         </Grid>
       </Grid>;
   //This is Step 3
-const step3 = <Grid container spacing={1} alignItems="flex-end" className="gridAll">
-     
-      {stateErrors ? <div style={{width: '100%', fontSize: '17px', color: 'red'}}> <ul>
-          {stateErrors.map((err, key) => (
-          <li key={key}>{err.message}</li>))}
-      </ul> </div> : null }
-      
-          <Grid item className="gridItem">
-            <TextField id="input-with-icon-grid" label="E-Mail" className="textField" InputProps={{className: "input"}} name="firstName" name="email" value={userInput.email} onChange={handleChangeInput}/>
-        </Grid>
-        
+const step3 = (
+	<Grid container spacing={1} alignItems="flex-end" className="gridAll">
+		{stateErrors ? (
+			<div style={{ width: "100%", fontSize: "17px", color: "red" }}>
+				{" "}
+				<ul>
+					{stateErrors.map((err, key) => (
+						<li key={key}>{err.message}</li>
+					))}
+				</ul>{" "}
+			</div>
+		) : null}
 
-        {userInput.userType === "Worker" ? service : " " }
-        <Grid item className="gridItem">
-              <FormControl className={clsx(classes.margin, classes.textField)}>
-              <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
-              <Input
-                id="standard-adornment-password"
-                type={values.showPassword ? 'text' : 'password'}
-                value={values.password}
-                onChange={handleChange('password')}
-                name="password"
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                    >
-                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-            </FormControl>
-          </Grid>
-          <Grid item className="gridItem">
-              <FormControl className={clsx(classes.margin, classes.textField)}>
-              <InputLabel htmlFor="standard-adornment-password">Confirm Password</InputLabel>
-              <Input
-                id="standard-adornment-password"
-                type={values.showPassword ? 'text' : 'password'}
-                value={values.password}
-                onChange={handleChange('password')}
-                name="confirm_password"
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                    >
-                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-              />
-            </FormControl>
-          </Grid>
-          { dataError ? dataError.map((key, err) => (
-                  <Typography className="title" key={key} color="textSecondary" gutterBottom>
-                    {alert(err)}
-                  </Typography> 
-                )
-              ) : null
-          }
-          {userInput.userType === "Worker" ? (  
-          <Typography className={classes.instructions}>Agree Terms and Conditions 
-            <Button onClick={() => setOpen({openDialog: true })} color="primary" >View</Button>
-          </Typography>
-          
+		<Grid item className="gridItem">
+			<TextField
+				id="input-with-icon-grid"
+				label="E-Mail"
+				className="textField"
+				InputProps={{ className: "input" }}
+				name="firstName"
+				name="email"
+				value={userInput.email}
+				onChange={handleChangeInput}
+			/>
+		</Grid>
 
-            ) 
-      : null }
-      </Grid>;
+		{userInput.userType === "Worker" ? service : " "}
+		<Grid item className="gridItem">
+			<FormControl className={clsx(classes.margin, classes.textField)}>
+				<InputLabel htmlFor="standard-adornment-password">
+					Password
+				</InputLabel>
+				<Input
+					id="standard-adornment-password"
+					type={values.showPassword ? "text" : "password"}
+					value={values.password}
+					onChange={handleChange("password")}
+					name="password"
+					endAdornment={
+						<InputAdornment position="end">
+							<IconButton
+								aria-label="toggle password visibility"
+								onClick={handleClickShowPassword}
+								onMouseDown={handleMouseDownPassword}>
+								{values.showPassword ? (
+									<Visibility />
+								) : (
+									<VisibilityOff />
+								)}
+							</IconButton>
+						</InputAdornment>
+					}
+				/>
+			</FormControl>
+		</Grid>
+		{error ? (
+			<ErrorHandler
+				error={error}
+				onHandle={() => setError('')}
+			/>
+		) : null}
+		<Grid item className="gridItem">
+			<FormControl className={clsx(classes.margin, classes.textField)}>
+				<InputLabel htmlFor="standard-adornment-password">
+					Confirm Password
+				</InputLabel>
+				<Input
+					id="standard-adornment-password"
+					type={cPass.showPassword ? "text" : "password"}
+					value={cPass.confirm_password}
+					onChange={handlePasswordChange("confirm_password")}
+					name="confirm_password"
+					endAdornment={
+						<InputAdornment position="end">
+							<IconButton
+								aria-label="toggle password visibility"
+								onClick={handleClickShowCPassword}
+								onMouseDown={handleMouseDownPassword}>
+								{cPass.showPassword ? (
+									<Visibility />
+								) : (
+									<VisibilityOff />
+								)}
+							</IconButton>
+						</InputAdornment>
+					}
+				/>
+			</FormControl>
+		</Grid>
+		{dataError
+			? dataError.map((key, err) => (
+					<Typography
+						className="title"
+						key={key}
+						color="textSecondary"
+						gutterBottom>
+						{alert(err)}
+					</Typography>
+			  ))
+			: null}
+		{userInput.userType === "Worker" ? (
+			<Typography className={classes.instructions}>
+				Agree Terms and Conditions
+				<Button
+					onClick={() => setOpen({ openDialog: true })}
+					color="primary">
+					View
+				</Button>
+			</Typography>
+		) : null}
+	</Grid>
+);
 const getStepContent = (stepIndex) => {
   switch (stepIndex) {
     case 0:
@@ -853,7 +907,8 @@ const getStepContent = (stepIndex) => {
                   province: province.province_name,
                   district: district.district_name,
                   sector: sector.sector_name,
-                  password: values.password
+                  password: values.password,
+                  confirm_password: cPass.confirm_password
                 })
               }
             >

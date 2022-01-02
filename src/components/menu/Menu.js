@@ -15,20 +15,21 @@ function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`nav-tabpanel-${index}`}
-      aria-labelledby={`nav-tab-${index}`}
-      {...other}
-      style={{backgroundColor: "#1C3956"}}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
+		<React.Fragment>
+			<div
+				role="tabpanel"
+				hidden={value !== index}
+				id={`nav-tabpanel-${index}`}
+				aria-labelledby={`nav-tab-${index}`}
+				{...other}
+				style={{ backgroundColor: "#1C3956" }}>
+				{value === index && (
+					<Box p={3}>
+						<Typography>{children}</Typography>
+					</Box>
+				)}
+			</div>
+		</React.Fragment>
   );
 }
 

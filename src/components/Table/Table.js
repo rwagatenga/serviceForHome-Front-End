@@ -204,9 +204,9 @@ function Row(props) {
 						</IconButton>
 					</TableCell>
 					<TableCell component="th" scope="row">
-						{index + 1}
+						<b>{index + 1}</b>
 					</TableCell>
-					<TableCell>{item.serviceName}</TableCell>
+					<TableCell><b>{item.serviceName}</b></TableCell>
 					{/*<TableCell >
             <EditIcon onClick = {() => alert(item._id)} />
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -377,7 +377,7 @@ export default function Tables(props) {
             </TableRow>
           </TableHead>
         ) : null}
-        <TableBody>
+        <TableBody key={1}>
             <Row 
               tableSubHead = {props.tableSubHead} 
               test = {props.tableTest} 

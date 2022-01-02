@@ -4,9 +4,13 @@ import HomeServiceLogo from '../../assets/images/Logo3.JPG';
 import './logo.css';
 
 const logo = (props) => (
-    <div className="Logo" style={{height: props.height}}>
-        <img src={HomeServiceLogo} alt="MyLogo" />
-    </div>
+	<div className="container">
+		<div className="text">
+			TECH SERVICE <br />
+			MANAGEMENT SYSTEM
+			{/*<img src={HomeServiceLogo} alt="MyLogo" />*/}
+		</div>
+	</div>
 );
 
 export default logo;

@@ -1,4 +1,5 @@
 import * as actionTypes from './actionTypes.js';
+import axios from "axios"
 
 export const orderStart = () => {
 	return {
@@ -21,6 +22,7 @@ export const orderSuccess = (orders) => {
 	}
 };
 
+	
 export const ordersFail = (error) => {
 	return {
 		type: actionTypes.ORDER_FAIL,
@@ -45,53 +47,175 @@ export const orderClose = () => {
 		type: actionTypes.ORDER_CLOSE
 	}
 };
-export const createOrder = (clientId, inputs) => {
+export const opayStart = () => {
+	return {
+		type: actionTypes,
+	}
+}
+export const opayFail = (error) => {
+	return {
+		type: actionTypes.OPAY_FAIL,
+		error: error
+	}
+}
+export const opaySuccess = (opay, transactionId) => {
+	return {
+		type: actionTypes.OPAY_SUCCESS,
+		opay: opay,
+		transactionId: transactionId
+	}
+}
+export const firebaseStart = () => {
+	return {
+		type: actionTypes.FIREBASE_START
+	}
+}
+export const firebaseFail = (error) => {
+	return {
+		type: actionTypes.FIREBASE_FAIL,
+		error: error
+	}
+}
+export const firebaseSuccess = (firebase, transactionId) => {
+	return {
+		type: actionTypes.FIREBASE_SUCCESS,
+		firebase: firebase,
+		transactionId: transactionId
+	}
+}
+export const initFirebase = () => {
+	return (dispatch) => {
+		axios.get(actionTypes.FIREBASE_URL)
+		.then((res) => {
+			Object.keys(res.data).forEach((key) => {
+				dispatch(firebaseSuccess(res.data[key]))
+			});
+		})
+		.catch((err) => dispatch(firebaseFail(err)));
+	}
+}
+export const createOrder = (clientId, data, pay) => {
 	return dispatch => {
+		const users = localStorage.getItem("users");
+		const user = JSON.parse(users);
+		console.log("P", pay)
+		const inputs = { ...data, telephone: user.telephone };
 		dispatch(orderStart());
-		const orderQuery = {
-        query: `
+		if (!pay) {
+			dispatch(opayStart());
+			const transactionId = Math.floor(Math.random() * 10000);
+			let firebaseData = [];
+			dispatch(initFirebase(transactionId));
+			const payingFee = {
+				query: `
+				mutation($payment: PayConnections) {
+					payingFee(payment: $payment) {
+						telephoneNumber
+						amount
+						description
+						status
+						code
+						transactionId
+					}
+				}
+			`,
+				variables: {
+					payment: {
+						telephoneNumber: "250781448238",
+						amount: "100",
+						organizationId: "25511728-20d4-4346-86a4-12e8a71e6f8d",
+						description: "Payment for Printing services",
+						callbackUrl: actionTypes.FIREBASE_URL,
+						transactionId: transactionId.toString(),
+					},
+				},
+			};
+			fetch(actionTypes.URL, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payingFee),
+			})
+				.then((response) => response.json())
+				.then((opay) => {
+					if (opay.data.code == 200) {
+							const orderQuery = {
+								query: `
           mutation createOrders($clientId: ID, $orderInput: orderInputData) {
             createOrders(clientId: $clientId, orderInput: $orderInput) {
               	_id
             }
           }`,
-          variables: {
-				clientId: clientId,
-				orderInput: {
-					serviceId: inputs.serviceId,
-					subServiceId: inputs.subServiceId,
-					price: inputs.price,
-					duration: inputs.duration,
-					description: inputs.description
-				}
-			}
-      };
-		fetch(actionTypes.URL, {
-	      method: 'POST',
-	      headers: {
-	         'Content-Type': 'application/json'
-	      },
-	      body: JSON.stringify(orderQuery)
-	   })
-	    .then(res => {
-	        return res.json();
-	    })
-	    .then(resData => {
-	        if (resData.errors) {
-	         if (resData.errors[0].message.match(/getaddrinfo ENOTFOUND/g)) {
-               let message = "Check Your Internet Connection";
-               dispatch(createOrderFail(message));
-            }
-            dispatch(createOrderFail(resData.errors[0].message));
-	      } else {
-		      dispatch(createOrderSuccess());
-		      dispatch(orderSuccess(resData.data.viewOrders.orders));
-		     }
-	    })
-	    .catch(err => {
-	    	dispatch(ordersFail());
-	        console.log(err);
-	    });
+								variables: {
+									clientId: clientId,
+									orderInput: {
+										serviceId: inputs.serviceId,
+										subServiceId: inputs.subServiceId,
+										price: inputs.price,
+										duration: inputs.duration,
+										description: inputs.description,
+									},
+								},
+							};
+							fetch(actionTypes.URL, {
+								method: "POST",
+								headers: {
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify(orderQuery),
+							})
+								.then((res) => {
+									return res.json();
+								})
+								.then((resData) => {
+									if (resData.errors) {
+										if (
+											resData.errors[0].message.match(
+												/getaddrinfo ENOTFOUND/g
+											)
+										) {
+											let message =
+												"Check Your Internet Connection";
+											dispatch(createOrderFail(message));
+										}
+										dispatch(
+											createOrderFail(
+												resData.errors[0].message
+											)
+										);
+									} else {
+										dispatch(createOrderSuccess());
+										dispatch(
+											orderSuccess(
+												resData.data.viewOrders.orders
+											)
+										);
+									}
+								})
+								.catch((err) => {
+									dispatch(ordersFail());
+									console.log(err);
+								});
+					}
+					dispatch(opaySuccess(opay.data.payingFee));
+					axios
+						.get(actionTypes.FIREBASE_URL)
+						.then((res) => {
+							Object.keys(res.data).forEach((key) => {
+								dispatch(
+									firebaseSuccess(
+										res.data[key],
+										transactionId
+									)
+								);
+							});
+						})
+						.catch((err) => dispatch(firebaseFail(err)));
+				})
+				.catch((err) => dispatch(opayFail(err)));
+		}
+	
 	}
 }
 
@@ -155,6 +279,7 @@ export const initOrders = (userId) => {
 	    });
 	}
 };
+
 export const yourOrders = (userId, yourId) => {
 	return dispatch => {
 		dispatch(orderStart());
@@ -216,11 +341,49 @@ export const yourOrders = (userId, yourId) => {
 	}
 };
 
-export const cartOrder = (clientId, cartId) => {
+export const cartOrder = (clientId, cartId, pay) => {
 	return dispatch => {
-		dispatch(orderStart());
-		const cartOrderQuery = {
-			query: `
+		if (!pay) {
+			dispatch(opayStart());
+			const transactionId = Math.floor(Math.random() * 10000);
+			let firebaseData = [];
+			dispatch(initFirebase(transactionId));
+			const payingFee = {
+				query: `
+				mutation($payment: PayConnections) {
+					payingFee(payment: $payment) {
+						telephoneNumber
+						amount
+						description
+						status
+						code
+						transactionId
+					}
+				}
+			`,
+				variables: {
+					payment: {
+						telephoneNumber: "250781448238",
+						amount: "1000",
+						organizationId: "25511728-20d4-4346-86a4-12e8a71e6f8d",
+						description: "Payment for Printing services",
+						callbackUrl: actionTypes.FIREBASE_URL,
+						transactionId: transactionId.toString(),
+					},
+				},
+			};
+			fetch(actionTypes.URL, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payingFee),
+			})
+				.then((response) => response.json())
+				.then((opay) => {
+					if (opay.data.code == 200) {
+						const cartOrderQuery = {
+							query: `
 			mutation cartOrder($clientId: ID!, $cartId: ID!) {
 				cartOrder(clientId: $clientId, cartId: $cartId) {
 					orders {
@@ -252,35 +415,54 @@ export const cartOrder = (clientId, cartId) => {
 				  	}
 				}
 			}`,
-			variables: {
-				clientId: clientId,
-				cartId: cartId
-			}
-		};
-		fetch(actionTypes.URL, {
-	      method: 'POST',
-	      headers: {
-	         'Content-Type': 'application/json'
-	      },
-	      body: JSON.stringify(cartOrderQuery)
-	   })
-	   .then(res => {
-	      return res.json();
-	   })
-	   .then(resData => {
-	      if (resData.errors) {
-	         if (resData.errors[0].message.match(/getaddrinfo ENOTFOUND/g)) {
-               let message = "Check Your Internet Connection";
-               dispatch(createOrderFail(message));
-            }
-            dispatch(createOrderFail(resData.errors[0].message));
-	      } else {
-		      dispatch(createOrderSuccess());
-		      dispatch(orderSuccess(resData.data.cartOrder.orders));
-		   }
-	   })
-	   .catch(err => {
-	    	dispatch(ordersFail());
-	   });
+							variables: {
+								clientId: clientId,
+								cartId: cartId,
+							},
+						};
+						fetch(actionTypes.URL, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify(cartOrderQuery),
+						})
+							.then((res) => {
+								return res.json();
+							})
+							.then((resData) => {
+								if (resData.errors) {
+									if (
+										resData.errors[0].message.match(
+											/getaddrinfo ENOTFOUND/g
+										)
+									) {
+										let message =
+											"Check Your Internet Connection";
+										dispatch(createOrderFail(message));
+									}
+									dispatch(
+										createOrderFail(
+											resData.errors[0].message
+										)
+									);
+								} else {
+									dispatch(createOrderSuccess());
+									dispatch(
+										orderSuccess(
+											resData.data.cartOrder.orders
+										)
+									);
+								}
+							})
+							.catch((err) => {
+								dispatch(ordersFail());
+							});
+					}
+				})
+				.catch((err) => dispatch(firebaseFail(err)))
+				.catch((err) => dispatch(opayFail(err)));
+		}
+		
 	}
 };

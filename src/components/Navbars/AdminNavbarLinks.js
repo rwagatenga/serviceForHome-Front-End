@@ -80,7 +80,7 @@ function AdminNavbarLinks(props) {
           <p className={classes.linkText}>Dashboard</p>
         </Hidden>
       </Button>
-      <div className={classes.manager}>
+      {/*<div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? "transparent" : "white"}
           justIcon={window.innerWidth > 959}
@@ -90,7 +90,7 @@ function AdminNavbarLinks(props) {
           onClick={handleClickNotification}
           className={classes.buttonLink}
         >
-          <Notifications className={classes.icons} />
+          <Notifications className={classes.icons} /> 
           <span className={classes.notifications}>5</span>
           <Hidden mdUp implementation="css">
             <p onClick={handleCloseNotification} className={classes.linkText}>
@@ -157,7 +157,7 @@ function AdminNavbarLinks(props) {
             </Grow>
           )}
         </Poppers>
-      </div>
+      </div>*/}
       <div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? "transparent" : "white"}

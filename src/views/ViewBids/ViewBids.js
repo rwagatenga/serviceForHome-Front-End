@@ -82,7 +82,8 @@ function ViewBids(props) {
   const initData = [];
   React.useEffect(() => {
     props.onFetchOrders(props.userId, props.userId);
-  }, [props.bidSuccess]);
+    props.onFetchBids(props.userId, orderId)
+  }, [props.bidSuccess, orderId]);
 
   const handleServiceChange = (event) => {
     let findBid = props.orders.find((item) => item._id === event.target.value);
@@ -123,7 +124,7 @@ function ViewBids(props) {
               tableHeaderColor="primary"
               tableHead={["ID", "Names", "Price", "Created At", "Duration", "Action"]}
               tableSubHead={["Description"]}
-              //tableData={props.bids}
+              tableData={props.bids}
               //tableTest={props.bids}
               colors={classes.button}
               adminView = "admin"
@@ -147,6 +148,7 @@ const mapStateToProps = state => {
         services: state.service.services,
         userId: state.auth.userId,
         orders: state.order.orders,
+        bids: state.bid.bids
     };
 };
 
@@ -156,6 +158,7 @@ const mapDispatchToProps = dispatch => {
         onSetAuthRedirectPath: () => dispatch( actions.setAuthRedirectPath( '/' ) ),
         onCancel: () => dispatch( actions.onCancel() ),
         onFetchOrders: (userId, youId) => dispatch(actions.yourOrders(userId, youId)),
+        onFetchBids: (userId, offeredBid) => dispatch(actions.initBids(userId, offeredBid)),
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ViewBids)

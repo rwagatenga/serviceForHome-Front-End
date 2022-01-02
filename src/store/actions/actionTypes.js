@@ -52,5 +52,16 @@ export const BID_CLOSE = "BID_CLOSE";
 
 //Location
 export const LOCATION = "LOCATION";
+
+// Order Payment
+export const OPAY_START = "OPAY_START";
+export const OPAY_FAIL = "OPAY_FAIL";
+export const OPAY_SUCCESS = "OPAY_SUCCESS"
+export const FIREBASE_START = "FIREBASE_START";
+export const FIREBASE_SUCCESS = "FIREBASE_SUCCESS";
+export const FIREBASE_FAIL = "FIREBASE_FAIL";
+
 // URL
 export const URL = "http://localhost:8080";
+export const OPAY = "https://opay-api.oltranz.com/opay/paymentrequest";
+export const FIREBASE_URL = "https://todo-app-d6049.firebaseio.com/Payment.json";

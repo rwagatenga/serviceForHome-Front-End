@@ -9,6 +9,7 @@ import Logo from './components/logo/Logo';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Menu from './components/menu/Menu';
+import Landing from "./views/Landing/index"
 // core components
 import Admin from "layouts/Admin.js";
 import Client from "layouts/Client.js"
@@ -30,6 +31,10 @@ class App extends Component {
   componentDidMount () {
     this.props.onTryAutoSignup();
     this.props.onDetectingLocation()
+    setTimeout(() => {this.props.onFetchFirebase(this.props.transactionId)}, 2000)
+    setTimeout(() => {
+		console.log("TRANS", this.props.transactionId);
+	}, 2000);
   }
   
   render() {
@@ -56,15 +61,7 @@ class App extends Component {
 			</Router>
 		);
     }
-    apps = (
-      <div style={{backgroundColor: "#0E3D51", color: "white"}}>
-        <Container fixed style={{backgroundColor: "#0E3D51", color: "white"}}>
-        <Typography component="div" style={{ backgroundColor: '#0E3D51', height: '100vh' }} >
-          <Logo />
-          <Menu />
-        </Typography>
-        </Container>
-      </div>);
+    apps = <Landing />;
 
     return (
       <div>
@@ -77,14 +74,16 @@ const mapStateToProps = state => {
   return {
     isAuthenticated: state.auth.token !== null,
     userType: state.auth.user.userType,
-    location: state.auth.location
+    location: state.auth.location,
+    transactionId: state.order.transactionId
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onTryAutoSignup: () => dispatch(actions.authCheckState()),
-    onDetectingLocation: () => dispatch(actions.detectLocation())
+		onTryAutoSignup: () => dispatch(actions.authCheckState()),
+		onDetectingLocation: () => dispatch(actions.detectLocation()),
+		onFetchFirebase: () => dispatch(actions.initFirebase()),
   };
 };
 export default connect( mapStateToProps, mapDispatchToProps )( App );

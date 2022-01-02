@@ -61,8 +61,6 @@ export default function ProfileDialog(props) {
         <DialogTitle id="responsive-dialog-title">
           <div className={classes.root}>
             <Avatar>{props.data.map(item => item.workerId.map(prop => ([prop.firstName.charAt(0)])) )}</Avatar>
-            <Avatar>{props.data.map(item => item.workerId.map(prop => ([prop.lastName.charAt(0)])) )}</Avatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" className={classes.large} />
           </div>
           </DialogTitle>
         <DialogContent>
