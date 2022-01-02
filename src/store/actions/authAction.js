@@ -65,6 +65,7 @@ export const detectLocation = () => {
 				latitude: position.coords.latitude,
 				longitude: position.coords.longitude,
 			};
+			console.log(location)
 			dispatch(locationSuccess(location));
 		});
 	};
@@ -216,8 +217,8 @@ export const createAccount = (
 		if (userInput.userType === "Client") {
 			const graphqlQuery = {
 				query: `
-                mutation createUser($token: String, $firstName: String!, $lastName: String!, $sex: String!, $telephone: String!, $email: String!, $password: String!, $userType: String!, $address: Address!) {
-                    createUser(token: $token, userInput: {firstName: $firstName, lastName: $lastName, sex: $sex, telephone: $telephone, email: $email, password: $password, userType: $userType, address: $address }) {
+                mutation createUser($token: String, $firstName: String!, $lastName: String!, $sex: String!, $telephone: String!, $email: String!, $password: String!, $userType: String!, $address: Address!, $location: LocationInput!, $loc: GeoLocationInput!, $connections: PayConnections) {
+                    createUser(token: $token, userInput: {firstName: $firstName, lastName: $lastName, sex: $sex, telephone: $telephone, email: $email, password: $password, userType: $userType, address: $address, location: $location, loc: $loc, connections: $connections }) {
                         _id
                         firstName
                         lastName
@@ -230,6 +231,14 @@ export const createAccount = (
                             district
                             sector
                         }
+						location {
+							latitude
+							longitude
+						}
+						loc {
+							type
+							coordinates
+						}
                         token
                         expiresIn
                     }
@@ -247,6 +256,8 @@ export const createAccount = (
 						district: userInput.district,
 						sector: userInput.sector,
 					},
+					location: userInput.location,
+					loc: userInput.loc,
 				},
 			};
 			fetch(actionTypes.URL, {
@@ -315,10 +326,22 @@ export const createAccount = (
 				});
 		}
 		if (userInput.userType === "Worker") {
+			const connections = {
+				amount: "",
+				telephoneNumber: "",
+				transactionId: "",
+				status: "",
+				statusCode: "",
+				statusDescription: "",
+				paidAmount: "",
+				responseTimeStamp: "",
+				callbackUrl: "",
+				description: ""
+			}
 			const graphqlQuery = {
 				query: `
-                mutation createUser($serviceId: ID!, $subServiceId: [ID!]!, $firstName: String!, $lastName: String!, $sex: String!, $telephone: String!, $email: String!, $password: String!, $userType: String!, $address: Address!, $priceTag: String, $negotiate: String) {
-                    createUser(serviceId: $serviceId, subServiceId: $subServiceId, userInput: {firstName: $firstName, lastName: $lastName, sex: $sex, telephone: $telephone, email: $email, password: $password, userType: $userType, address: $address, priceTag: $priceTag, negotiate: $negotiate }) {
+                mutation createUser($serviceId: ID!, $subServiceId: [ID!]!, $firstName: String!, $lastName: String!, $sex: String!, $telephone: String!, $email: String!, $password: String!, $userType: String!, $address: Address!, $priceTag: String, $negotiate: String, $location: LocationInput!, $loc: GeoLocationInput!, $connections: PayConnections) {
+                    createUser(serviceId: $serviceId, subServiceId: $subServiceId, userInput: {firstName: $firstName, lastName: $lastName, sex: $sex, telephone: $telephone, email: $email, password: $password, userType: $userType, address: $address, priceTag: $priceTag, negotiate: $negotiate, location: $location, loc: $loc, connections: $connections }) {
                         _id
                         firstName
                         lastName
@@ -339,6 +362,26 @@ export const createAccount = (
                             district
                             sector
                         }
+						location {
+							latitude
+							longitude
+						}
+						loc {
+							type
+							coordinates
+						}
+						connections {
+							amount
+							telephoneNumber
+							transactionId
+							status
+							statusCode
+							statusDescription
+							paidAmount
+							responseTimeStamp
+							callbackUrl
+							description
+						}
                         token
                         expiresIn
                     }
@@ -358,6 +401,9 @@ export const createAccount = (
 						district: userInput.district,
 						sector: userInput.sector,
 					},
+					location: userInput.location,
+					loc: userInput.loc,
+					connections: userInput.connections,
 					price: userInput.price,
 					negotiate: userInput.negotiate,
 				},

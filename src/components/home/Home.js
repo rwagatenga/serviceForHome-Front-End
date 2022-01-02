@@ -51,11 +51,18 @@ class Home extends Component {
   		const inputs = {
   			...data.userInputs, 
   			province: data.province, 
-  			district: data.district, 
+  			district: data.district,
   			sector: data.sector,
   			password: data.password,
-			location: {...this.props.location}
-			
+			location: {
+				latitude: parseFloat(this.props.location.latitude),
+				longitude: parseFloat(this.props.location.longitude)
+			},
+			loc: {
+				type: "Point",
+				coordinates: [parseFloat(this.props.location.latitude), parseFloat(this.props.location.longitude)]
+			},
+			connections:[]
   		}
   		this.props.onCreateAccount(token, experesIn, serviceId, subServiceId, inputs);
   	}
@@ -117,27 +124,26 @@ class Home extends Component {
             authRedirect = <Redirect to={this.props.authRedirectPath} />
         }
 		return (
-			<div>
-			<Fragment>
-				{this.props.loading ? <Backdrop 
-					open={ this.props.loading } 
-					onClick={this.props.onCancel} 
-				/> : null }
-				{this.props.error ? (<ErrorHandler 
-					error={this.props.error} 
-					onHandle={this.props.onCancel} 
-				/>) : null }
-			{ authRedirect }
-			</Fragment>
-				This an awesome Web App that will helps Clients and Technicians to find each other so that it can help clients
-				to offer or order a service at home and technician provide that service at home depends on a kind of issue.
-				<br/><br/>
-				We offer different services like {this.props.services.map(item => (<span>{item.serviceName}, </span>) )} It could be better to SignIn/SignUp to order a service or be active in order to be hired.
-				<br/><br/>
+			<React.Fragment>
+				<Fragment>
+					{this.props.loading ? (
+						<Backdrop
+							open={this.props.loading}
+							onClick={this.props.onCancel}
+						/>
+					) : null}
+					{this.props.error ? (
+						<ErrorHandler
+							error={this.props.error}
+							onHandle={this.props.onCancel}
+						/>
+					) : null}
+					{authRedirect}
+				</Fragment>
 				<Card className="root">
-			      {this.state.signup ? signupForm : signinForm}
-			    </Card>
-			</div>
+					{this.state.signup ? signupForm : signinForm}
+				</Card>
+			</React.Fragment>
 		);
 	}
 }

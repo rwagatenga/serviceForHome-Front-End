@@ -17,3 +17,14 @@
 .Logo img {
     height: 100%;
 }
+
+.container {
+  width: 500px;
+}
+
+.text {
+  font-size: 30px;
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
+  font-style: italic;
+}

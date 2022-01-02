@@ -56,7 +56,8 @@ function Row(props) {
   });
   const [stateDialog, setDialog] = React.useState({
     openDialog: false,
-    congzDialog: false
+    congzDialog: false,
+    cartDialog: false
   });
   const [state, setState] = React.useState({
     services: [],
@@ -82,6 +83,8 @@ function Row(props) {
     // props.test.find(clickedItem => clickedItem._id === item ? setOpen(!open) : null);
   };
   const cartDialogHandle = (service, event) => {
+    
+	  console.log("CART", stateDialog.cartDialog);
     if (service) {
       const serv = props.test.find((item) => item._id === service.service);
       
@@ -97,7 +100,7 @@ function Row(props) {
           subServices: [sub]
         });
         setDialog({
-          openDialog: !stateDialog.openDialog
+          cartDialog: !stateDialog.cartDialog
         });
       }
     }
@@ -121,12 +124,7 @@ function Row(props) {
     }
   };
   const closeDialogHandle = () => {
-    setDialog({
-      openDialog: false
-    });
-    setDialog({
-      congzDialog: false
-    });
+    setDialog({ ...stateDialog, openDialog: false, congzDialog: false, cartDialog: false });
 
   };
   const orderHandler = (event, data) => {
@@ -135,7 +133,7 @@ function Row(props) {
   };
   const orderClose = () => {
     props.orderClose();
-    setDialog({openDialog: false})
+    setDialog({ ...stateDialog, openDialog: false, cartDialog: false });
   };
   const cartHandler = (event, data) => {
     event.preventDefault();
@@ -143,117 +141,193 @@ function Row(props) {
   };
   const cartClose = () => {
     props.cartClose();
-    setDialog({openDialog: false});
-    setDialog({cartDialog: false});
+    setDialog({...stateDialog, openDialog: false, cartDialog: false });
   }
   return (
-    <React.Fragment>
-      {state.services && state.subServices && !props.orderSuccess ? (
-        <OrderDialog 
-          open = {stateDialog.openDialog}
-          close = {closeDialogHandle} 
-          subService = {state.subServices}
-          service = {state.services}
-          color={props.color} 
-          orderSuccess={props.orderSuccess}
-          createOrder = {orderHandler}
-          loading = {props.loading}
-          error={props.error}  
-        />) : props.orderSuccess ? (
-        <CongzDialog
-          open={props.orderSuccess}
-          close={orderClose}
-          order={props.orderSuccess}
-        />
-      ) : null}
-      {state.services && state.subServices && !props.cartSuccess  && !stateDialog.cartDialog ? (
-        <CartDialog 
-          open = {stateDialog.openDialog}
-          close = {closeDialogHandle} 
-          subService = {state.subServices}
-          service = {state.services}
-          color={props.color} 
-          cartSuccess={props.cartSuccess}
-          createCart = {cartHandler}
-          loading = {props.load}
-          error={props.cartError}  
-        />) : props.cartSuccess && !stateDialog.cartDialog ? (
-        <CongzDialog
-          open={props.cartSuccess}
-          close={cartClose}
-          cart={props.cartSuccess}
-        />
-      ) : null}
-      {props.test.map((item, index) => ([
-        <TableRow className={classes.root} key={index}>
-          <TableCell>
-            <IconButton aria-label="expand row" size="small" onClick={e => handleCollapse(item._id)}>
-              {open.stateOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </TableCell>
-          <TableCell component="th" scope="row">
-            {index+1}
-          </TableCell>
-          <TableCell>{item.serviceName}</TableCell>
-          {/*<TableCell >
+		<React.Fragment>
+			{state.services &&
+			state.subServices &&
+			!props.orderSuccess &&
+			stateDialog.openDialog ? (
+				<OrderDialog
+					open={stateDialog.openDialog}
+					close={closeDialogHandle}
+					subService={state.subServices}
+					service={state.services}
+					color={props.color}
+					orderSuccess={props.orderSuccess}
+					createOrder={orderHandler}
+					loading={props.loading}
+					error={props.error}
+				/>
+			) : props.orderSuccess ? (
+				<CongzDialog
+					open={props.orderSuccess}
+					close={orderClose}
+					order={props.orderSuccess}
+				/>
+			) : null}
+			{state.services &&
+			state.subServices &&
+			!props.cartSuccess &&
+			stateDialog.cartDialog ? (
+				<CartDialog
+					open={stateDialog.cartDialog}
+					close={closeDialogHandle}
+					subService={state.subServices}
+					service={state.services}
+					color={props.color}
+					cartSuccess={props.cartSuccess}
+					createCart={cartHandler}
+					loading={props.load}
+					error={props.cartError}
+				/>
+			) : props.cartSuccess && !stateDialog.cartDialog ? (
+				<CongzDialog
+					open={props.cartSuccess}
+					close={cartClose}
+					cart={props.cartSuccess}
+				/>
+			) : null}
+			{props.test.map((item, index) => [
+				<TableRow className={classes.root} key={index}>
+					<TableCell>
+						<IconButton
+							aria-label="expand row"
+							size="small"
+							onClick={(e) => handleCollapse(item._id)}>
+							{open.stateOpen ? (
+								<KeyboardArrowUpIcon />
+							) : (
+								<KeyboardArrowDownIcon />
+							)}
+						</IconButton>
+					</TableCell>
+					<TableCell component="th" scope="row">
+						<b>{index + 1}</b>
+					</TableCell>
+					<TableCell><b>{item.serviceName}</b></TableCell>
+					{/*<TableCell >
             <EditIcon onClick = {() => alert(item._id)} />
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <DeleteIcon onClick = {() => alert(item._id)} />
           </TableCell>*/}
-        </TableRow>,
-        <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          {open.stateOpen && open.stateId === item._id ? (
-            <Collapse in={open} timeout="auto" unmountOnExit id={id}>
-              <Box margin={1}>
-                <Typography variant="h6" gutterBottom component="div">
-                  Sub-Services
-                </Typography>
-                <Table size="small" aria-label="purchases">
-                  <TableHead>
-                    <TableRow>
-                      {props.tableSubHead ? props.tableSubHead.map((prop, key) => (
-                        <TableCell key={key}>{prop}</TableCell>
-                      )) : null}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {item.subServiceId.map((prop, key) => (
-                      <TableRow key={key}>
-                        <TableCell component="th" scope="row">
-                          {key+1}
-                        </TableCell>
-                        <TableCell>{prop.subServiceName}</TableCell>
-                        <TableCell>{prop.price}</TableCell>
-                        <TableCell className={classes.tableCell} key={key}>
-                          <Button type = "submit" variant="contained" onClick = {() => cartDialogHandle({service: item._id, subService: prop._id},prop._id)} className={props.color}>
-                            Add To Cart
-                            &nbsp;&nbsp;&nbsp;
-                            <AddShoppingCartIcon/>
-                          </Button>
-                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                          <Button type = "submit" variant="contained" onClick = {e => handleDialog({service: item._id, subService: prop._id},prop._id)} className={props.color}>
-                            Order
-                            &nbsp;&nbsp;&nbsp;<ShoppingCartIcon/>
-                          </Button>
-                        </TableCell>
-                        {/*<TableCell>
+				</TableRow>,
+				<TableRow>
+					<TableCell
+						style={{ paddingBottom: 0, paddingTop: 0 }}
+						colSpan={6}>
+						{open.stateOpen && open.stateId === item._id ? (
+							<Collapse
+								in={open}
+								timeout="auto"
+								unmountOnExit
+								id={id}>
+								<Box margin={1}>
+									<Typography
+										variant="h6"
+										gutterBottom
+										component="div">
+										Sub-Services
+									</Typography>
+									<Table size="small" aria-label="purchases">
+										<TableHead>
+											<TableRow>
+												{props.tableSubHead
+													? props.tableSubHead.map(
+															(prop, key) => (
+																<TableCell
+																	key={key}>
+																	{prop}
+																</TableCell>
+															)
+													  )
+													: null}
+											</TableRow>
+										</TableHead>
+										<TableBody>
+											{item.subServiceId.map(
+												(prop, key) => (
+													<TableRow key={key}>
+														<TableCell
+															component="th"
+															scope="row">
+															{key + 1}
+														</TableCell>
+														<TableCell>
+															{
+																prop.subServiceName
+															}
+														</TableCell>
+														<TableCell>
+															{prop.price}
+														</TableCell>
+														<TableCell
+															className={
+																classes.tableCell
+															}
+															key={key}>
+															<Button
+																type="submit"
+																variant="contained"
+																onClick={() =>
+																	cartDialogHandle(
+																		{
+																			service:
+																				item._id,
+																			subService:
+																				prop._id,
+																		},
+																		prop._id
+																	)
+																}
+																className={
+																	props.color
+																}>
+																Add To Cart
+																&nbsp;&nbsp;&nbsp;
+																<AddShoppingCartIcon />
+															</Button>
+															&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+															<Button
+																type="submit"
+																variant="contained"
+																onClick={(e) =>
+																	handleDialog(
+																		{
+																			service:
+																				item._id,
+																			subService:
+																				prop._id,
+																		},
+																		prop._id
+																	)
+																}
+																className={
+																	props.color
+																}>
+																Order
+																&nbsp;&nbsp;&nbsp;
+																<ShoppingCartIcon />
+															</Button>
+														</TableCell>
+														{/*<TableCell>
                           <EditIcon onClick = {() => alert(item._id)}/>
                           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                           <DeleteIcon onClick = {() => alert(item._id)}/>
                         </TableCell>*/}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </Collapse>
-          ) : null }
-          </TableCell>
-        </TableRow>
-        ])
-      )}
-    </React.Fragment>
+													</TableRow>
+												)
+											)}
+										</TableBody>
+									</Table>
+								</Box>
+							</Collapse>
+						) : null}
+					</TableCell>
+				</TableRow>,
+			])}
+		</React.Fragment>
   );
 }
 
@@ -303,7 +377,7 @@ export default function Tables(props) {
             </TableRow>
           </TableHead>
         ) : null}
-        <TableBody>
+        <TableBody key={1}>
             <Row 
               tableSubHead = {props.tableSubHead} 
               test = {props.tableTest} 

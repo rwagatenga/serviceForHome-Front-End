@@ -107,7 +107,7 @@ function UserProfile(props) {
 					/>
 				) : null}
 				{props.loading ? <Backdrop open={props.loading} /> : null}
-				<GridItem xs={12} sm={12} md={4}>
+				{/* <GridItem xs={12} sm={12} md={4}>
 					<Card profile>
 						<CardAvatar profile>
 							<a
@@ -133,7 +133,7 @@ function UserProfile(props) {
 							</Button>
 						</CardBody>
 					</Card>
-				</GridItem>
+				</GridItem> */}
 			</GridContainer>
 		</div>
 	);

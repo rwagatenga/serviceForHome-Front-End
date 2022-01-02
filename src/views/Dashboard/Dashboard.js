@@ -42,53 +42,88 @@ import {
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 
 const useStyles = makeStyles(styles);
-
- function Dashboard(props) {
+function Dashboard(props) {
   const classes = useStyles();
+  const [state, setState] = React.useState({
+    clients: '',
+    workers: '',
+    orders: ''
+  })
+  React.useEffect(() => {
+    const dashboard = {
+		query: `
+        {
+          viewDashboard {
+            clients
+            workers
+            orders
+          }
+        }
+      `,
+	};
+    fetch("http://localhost:8080", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(dashboard)
+    })
+    .then(response => response.json())
+      .then(res => {
+        console.log("DASH",res)
+        setState({
+          ...state,
+          clients: res.data.viewDashboard.clients,
+          workers: res.data.viewDashboard.workers,
+          orders: res.data.viewDashboard.orders
+        })
+    })
+  }, [])
   return (
-    <div>
-      <GridContainer>
-        <GridItem xs={12} sm={6} md={3}>
-          <Card>
-            <CardHeader color="warning" stats icon>
-              <CardIcon color="warning">
-                <Icon>content_copy</Icon>
-              </CardIcon>
-              <p className={classes.cardCategory}>Used Space</p>
-              <h3 className={classes.cardTitle}>
-                49/50 <small>GB</small>
-              </h3>
-            </CardHeader>
-            <CardFooter stats>
-              <div className={classes.stats}>
-                <Danger>
-                  <Warning />
-                </Danger>
-                <a href="#pablo" onClick={e => e.preventDefault()}>
-                  Get more space
-                </a>
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
-          <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Store />
-              </CardIcon>
-              <p className={classes.cardCategory}>Revenue</p>
-              <h3 className={classes.cardTitle}>$34,245</h3>
-            </CardHeader>
-            <CardFooter stats>
-              <div className={classes.stats}>
-                <DateRange />
-                Last 24 Hours
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
+		<div>
+			<GridContainer>
+				<GridItem xs={12} sm={6} md={3}>
+					<Card>
+						<CardHeader color="warning" stats icon>
+							<CardIcon color="warning">
+								<Icon>content_copy</Icon>
+							</CardIcon>
+							<p className={classes.cardCategory}>Orders</p>
+							<h3 className={classes.cardTitle}>
+								{state.orders ? parseInt(state.orders) : 0}{" "}
+								{/*<small>GB</small>*/}
+							</h3>
+						</CardHeader>
+						<CardFooter stats>
+							<div className={classes.stats}>
+								<Danger>
+									<Warning />
+								</Danger>
+								<a href="/admin/viewOrders">View Orders</a>
+							</div>
+						</CardFooter>
+					</Card>
+				</GridItem>
+				<GridItem xs={12} sm={6} md={3}>
+					<Card>
+						<CardHeader color="success" stats icon>
+							<CardIcon color="success">
+								<Store />
+							</CardIcon>
+							<p className={classes.cardCategory}>Technicians</p>
+							<h3 className={classes.cardTitle}>
+								{state.workers ? parseInt(state.workers) : 0}
+							</h3>
+						</CardHeader>
+						<CardFooter stats>
+							<div className={classes.stats}>
+								<DateRange />
+								Total Technicians
+							</div>
+						</CardFooter>
+					</Card>
+				</GridItem>
+				{/*<GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
@@ -104,26 +139,28 @@ const useStyles = makeStyles(styles);
               </div>
             </CardFooter>
           </Card>
-        </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
-          <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
-                <Accessibility />
-              </CardIcon>
-              <p className={classes.cardCategory}>Followers</p>
-              <h3 className={classes.cardTitle}>+245</h3>
-            </CardHeader>
-            <CardFooter stats>
-              <div className={classes.stats}>
-                <Update />
-                Just Updated
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-      </GridContainer>
-      <GridContainer>
+        </GridItem>*/}
+				<GridItem xs={12} sm={6} md={3}>
+					<Card>
+						<CardHeader color="info" stats icon>
+							<CardIcon color="info">
+								<Accessibility />
+							</CardIcon>
+							<p className={classes.cardCategory}>Clients</p>
+							<h3 className={classes.cardTitle}>
+								{state.clients ? state.clients : 0}
+							</h3>
+						</CardHeader>
+						<CardFooter stats>
+							<div className={classes.stats}>
+								<Update />
+								Total Clients
+							</div>
+						</CardFooter>
+					</Card>
+				</GridItem>
+			</GridContainer>
+			{/*<GridContainer>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="success">
@@ -257,12 +294,12 @@ const useStyles = makeStyles(styles);
                   ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
                   ["4", "Philip Chaney", "$38,735", "Korea, South"]
                 ]}
-              />*/}
+              />
             </CardBody>
           </Card>
         </GridItem>
-      </GridContainer>
-    </div>
+      </GridContainer>*/}
+		</div>
   );
 }
 const mapStateToProps = state => {

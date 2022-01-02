@@ -73,7 +73,14 @@ function ViewServices(props) {
   const classes = useStyles();
   React.useEffect(() => {
     props.onFetchServices();
-  }, []);
+      // props.onFetchFirebase();
+  }, [props.transactionId]);
+  // const firebaseData = React.useMemo(() => {
+  //   return props.onFetchFirebase();
+  // }, [props.firebase])
+  // setTimeout(() => {
+  //     props.onFetchFirebase();
+  // }, 10000);
   const createOrderHandler = (event, data) => {
     event.preventDefault();
     props.onCreateOrder(props.userId, data);
@@ -82,6 +89,9 @@ function ViewServices(props) {
     ev.preventDefault();
     props.onCreateCart(props.userId, cartInputs);
   };
+  console.log("OPAY", props.opay)
+  console.log("FIREBASE", props.firebase)
+  console.log("TRANSACTIONI ID", props.transactionId)
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -174,7 +184,14 @@ const mapStateToProps = state => {
         authRedirectPath: state.auth.authRedirectPath,
         services: state.service.services,
         cartSuccess: state.cart.createdCart,
-        orderSuccess: state.order.createdOrder
+        orderSuccess: state.order.createdOrder,
+        opayLoading: state.order.opayLoading,
+        opayError: state.order.opayError,
+        opay: state.order.opay,
+        firebase: state.order.firebase, 
+        firebaseLoading: state.order.firebaseLoading, 
+        firebaseError: state.order.firebaseError,
+        transactionId: state.order.transactionId
     };
 };
 
@@ -187,7 +204,12 @@ const mapDispatchToProps = dispatch => {
         onCreateOrder: (clientId, inputs) => dispatch(actions.createOrder(clientId, inputs)),
         onOrderClose: () => dispatch(actions.orderClose()),
         onCreateCart: (clientId, cartInputs) => dispatch(actions.createCart(clientId, cartInputs)),
-        onCartClose: () => dispatch(actions.cartClose())
+        onCartClose: () => dispatch(actions.cartClose()),
+        onOpaySuccess: () => dispatch(actions.opaySuccess()),
+        onOpayFail: () => dispatch(actions.opayFail()),
+        onFirebaseFail: () => dispatch(actions.firebaseFail()),
+        onFirebaseSuccess: () => dispatch(actions.firebaseSuccess()),
+        onFetchFirebase: () => dispatch(actions.initFirebase())
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ViewServices);

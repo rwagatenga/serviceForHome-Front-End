@@ -188,6 +188,7 @@ function Row(props) {
   const closeBidHandler = () => {
       props.bidClose();
   }
+  console.log("ERR", props.error)
   return (
     <React.Fragment>
     {worker.length > 0 ? (
@@ -292,6 +293,7 @@ function BidsTable(props) {
     console.log(id);
     props.onAcceptBid(id);
   };
+  
   return (
     <TableContainer component={Paper} style={{maxHeight: 450}}>
       <Table stickyHeader aria-label="collapsible table">
@@ -315,9 +317,9 @@ function BidsTable(props) {
         {props.loading ? <Backdrop open={props.loading} clicked={props.onCancel} /> : null }
           <Row 
               tableSubHead = {props.tableSubHead} 
-              test = {props.bids} 
+              test = {props.tableData} 
               color={props.colors}
-              count={props.bids.length}
+              count={props.tableData.length}
               rowsPerPage={rowsPerPage}
               page={page}
               errors = {props.error}
@@ -332,7 +334,7 @@ function BidsTable(props) {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               colSpan={9}
-              count={props.bids.length}
+              count={props.tableData.length}
               rowsPerPage={rowsPerPage}
               page={page}
               SelectProps={{
